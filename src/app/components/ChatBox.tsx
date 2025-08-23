@@ -27,7 +27,10 @@ export const ChatBox = ({ className }: Props) => {
   };
 
   const handleSend = async () => {
-    if (newMessage.trim() === "") return;
+    if (newMessage.trim() === "") {
+      console.log("message is missing");
+      return;
+    }
 
     const nextId = messages.length + 1;
 
@@ -38,6 +41,10 @@ export const ChatBox = ({ className }: Props) => {
     });
 
     const data = await res.json();
+    if (data.error) {
+      console.error("Error");
+      return;
+    }
     console.log(data.response);
 
     setMessages([
