@@ -3,6 +3,7 @@ import { useState } from "react";
 import { Message, MessageList } from "./chatbox/MessageList";
 import { InputFiled } from "./chatbox/InputField";
 import { SendButton } from "./chatbox/SendButton";
+import { SendForm } from "./chatbox/SendForm";
 
 interface Props {
   className?: string;
@@ -62,8 +63,11 @@ export const ChatBox = ({ className }: Props) => {
         className="flex flex-col text-white gap-2 mt-10 p-2 max-h-[80vh] overflow-auto"
       />
       <div className="flex gap-2 mt-2 h-full">
-        <InputFiled value={newMessage} onChange={onChange} />
-        <SendButton onClick={handleSend} />
+        <SendForm
+          onChange={onChange}
+          handleSend={handleSend}
+          newMessage={newMessage}
+        />
       </div>
     </div>
   );
