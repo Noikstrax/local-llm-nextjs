@@ -1,9 +1,10 @@
 "use client";
 import { useState } from "react";
 import { Message, MessageList } from "./chatbox/MessageList";
-import { InputFiled } from "./chatbox/InputField";
-import { SendButton } from "./chatbox/SendButton";
 import { SendForm } from "./chatbox/SendForm";
+import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks";
+import { addMessage, createChat } from "../lib/features/chats/chatsSlice";
+import { useParams, useRouter } from "next/navigation";
 
 interface Props {
   className?: string;
@@ -19,7 +20,18 @@ const messagesTemplate: Message[] = [
 ];
 
 export const ChatBox = ({ className }: Props) => {
-  const [messages, setMessages] = useState<Message[]>(messagesTemplate);
+  const store = useAppStore();
+  const params = useParams<{ id: string }>();
+  const dispatch = useAppDispatch();
+  const navigate = useRouter();
+  const isCreatedChat = params.id ? true : false;
+
+  const messages: Message[] = isCreatedChat
+    ? useAppSelector((state) => {
+        const chat = state.chats.find((chat) => chat.chatId === params.id);
+        return chat ? chat.messages : [];
+      })
+    : [];
 
   const [newMessage, setNewMessage] = useState("");
 
@@ -32,8 +44,16 @@ export const ChatBox = ({ className }: Props) => {
       console.log("message is missing");
       return;
     }
-
+    const chatId = params.id ? params.id : crypto.randomUUID();
     const nextId = messages.length + 1;
+    if (!isCreatedChat) {
+      dispatch(createChat(chatId));
+    }
+
+    dispatch(
+      addMessage({ id: nextId, text: newMessage, owner: "user", chatId })
+    );
+    setNewMessage("");
 
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -48,12 +68,18 @@ export const ChatBox = ({ className }: Props) => {
     }
     console.log(data.response);
 
-    setMessages([
-      ...messages,
-      { id: nextId, text: newMessage, owner: "user" },
-      { id: nextId + 1, text: data.response, owner: "ai" },
-    ]);
-    setNewMessage("");
+    dispatch(
+      addMessage({
+        id: nextId + 1,
+        text: data.response,
+        owner: "ai",
+        chatId,
+      })
+    );
+
+    if (!params.id) {
+      navigate.push(`/chats/${chatId}`);
+    }
   };
 
   return (
