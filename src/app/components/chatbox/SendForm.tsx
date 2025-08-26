@@ -1,5 +1,4 @@
-import { InputFiled } from "./InputField";
-import { SendButton } from "./SendButton";
+"use client";
 
 interface Props {
   handleSend: () => void;

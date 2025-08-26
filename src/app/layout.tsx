@@ -34,7 +34,7 @@ export default function RootLayout({
         <StoreProvider>
           <div className="flex justify-center h-full">
             <div className="w-1/6 bg-zinc-900 hidden sm:hidden md:block">
-              <LeftBar className="text-white px-2 py-2" />
+              <LeftBar className="text-white px-2 py-2 w-full h-screen " />
             </div>
             <div className="md:w-5/6 w-full">{children}</div>
           </div>

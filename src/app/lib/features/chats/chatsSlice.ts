@@ -11,10 +11,21 @@ const initialState: Chat[] = [
   {
     chatId: "1",
     messages: [
-      { id: 1, text: "Okay man it`s alright", owner: "user" },
+      { id: 1, text: "User question", owner: "user" },
       {
         id: 2,
-        text: "Hahahahah",
+        text: "Ai answer",
+        owner: "ai",
+      },
+    ],
+  },
+  {
+    chatId: "2",
+    messages: [
+      { id: 1, text: "User question 2", owner: "user" },
+      {
+        id: 2,
+        text: "Ai answer 2",
         owner: "ai",
       },
     ],

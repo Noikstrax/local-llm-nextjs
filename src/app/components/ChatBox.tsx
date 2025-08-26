@@ -54,6 +54,9 @@ export const ChatBox = ({ className }: Props) => {
       addMessage({ id: nextId, text: newMessage, owner: "user", chatId })
     );
     setNewMessage("");
+    if (!params.id) {
+      navigate.push(`/chats/${chatId}`);
+    }
 
     const res = await fetch("/api/chat", {
       method: "POST",
@@ -76,10 +79,6 @@ export const ChatBox = ({ className }: Props) => {
         chatId,
       })
     );
-
-    if (!params.id) {
-      navigate.push(`/chats/${chatId}`);
-    }
   };
 
   return (
