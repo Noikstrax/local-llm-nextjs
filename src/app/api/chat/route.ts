@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { prompt } = body;
+    const { prompt, model } = body;
     if (!prompt) {
       return NextResponse.json({
         error: true,
@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
     }
 
     const ollamaPayload = {
-      model: "gemma:2b",
+      model,
       prompt,
       stream: false,
     };

@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Message, MessageList } from "./chatbox/MessageList";
 import { SendForm } from "./chatbox/SendForm";
-import { useAppDispatch, useAppSelector, useAppStore } from "../lib/hooks";
+import { useAppDispatch, useAppSelector } from "../lib/hooks";
 import { addMessage, createChat } from "../lib/features/chats/chatsSlice";
 import { useParams, useRouter } from "next/navigation";
 
@@ -10,21 +10,15 @@ interface Props {
   className?: string;
 }
 
-const messagesTemplate: Message[] = [
-  { id: 1, text: "Okay man it`s alright", owner: "user" },
-  {
-    id: 2,
-    text: "Hahahahah",
-    owner: "ai",
-  },
-];
-
 export const ChatBox = ({ className }: Props) => {
-  const store = useAppStore();
   const params = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const navigate = useRouter();
   const isCreatedChat = params.id ? true : false;
+
+  //TODO FIX THIS
+  const models = useAppSelector((state) => state.models);
+  const selectedModel = models.find((model) => model.isSelected);
 
   const messages: Message[] = isCreatedChat
     ? useAppSelector((state) => {
@@ -58,10 +52,13 @@ export const ChatBox = ({ className }: Props) => {
       navigate.push(`/chats/${chatId}`);
     }
 
+    const model = selectedModel?.name;
+    console.log(model);
+
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: newMessage }),
+      body: JSON.stringify({ prompt: newMessage, model }),
     });
 
     const data = await res.json();
@@ -70,11 +67,17 @@ export const ChatBox = ({ className }: Props) => {
       return;
     }
     console.log(data.response);
+    let answer;
+    if (data.response) {
+      answer = data.response;
+    } else {
+      answer = "Error";
+    }
 
     dispatch(
       addMessage({
         id: nextId + 1,
-        text: data.response,
+        text: answer,
         owner: "ai",
         chatId,
       })
