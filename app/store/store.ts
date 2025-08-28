@@ -1,6 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
-import chatsReducer from "./features/chats/chatsSlice";
-import modelsReducer from "./features/models/modelsSlice";
+import chatsReducer from "./chats/chatsSlice";
+import modelsReducer from "./models/modelsSlice";
 
 export const store = () =>
   configureStore({

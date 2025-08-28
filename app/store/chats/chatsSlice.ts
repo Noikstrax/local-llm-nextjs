@@ -1,4 +1,4 @@
-import { Message } from "@/app/components/chatbox/MessageList";
+import { Message } from "../../../src/pages/chat/chat-box/MessageList";
 import { createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 

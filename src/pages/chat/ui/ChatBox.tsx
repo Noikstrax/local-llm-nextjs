@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
-import { Message, MessageList } from "./chatbox/MessageList";
-import { SendForm } from "./chatbox/SendForm";
-import { useAppDispatch, useAppSelector } from "../lib/hooks";
-import { addMessage, createChat } from "../lib/features/chats/chatsSlice";
+import { Message, MessageList } from "./chat-box/MessageList";
+import { SendForm } from "./chat-box/SendForm";
+import { useAppDispatch, useAppSelector } from "../../../../app/store/hooks";
+import { addMessage, createChat } from "../../../../app/store/chats/chatsSlice";
 import { useParams, useRouter } from "next/navigation";
 
 interface Props {
@@ -14,7 +14,7 @@ export const ChatBox = ({ className }: Props) => {
   const params = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
   const navigate = useRouter();
-  const isCreatedChat = params.id ? true : false;
+  const isCreatedChat = params?.id ? true : false;
 
   //TODO FIX THIS
   const models = useAppSelector((state) => state.models);
@@ -22,7 +22,7 @@ export const ChatBox = ({ className }: Props) => {
 
   const messages: Message[] = isCreatedChat
     ? useAppSelector((state) => {
-        const chat = state.chats.find((chat) => chat.chatId === params.id);
+        const chat = state.chats.find((chat) => chat.chatId === params?.id);
         return chat ? chat.messages : [];
       })
     : [];
@@ -38,7 +38,7 @@ export const ChatBox = ({ className }: Props) => {
       console.log("message is missing");
       return;
     }
-    const chatId = params.id ? params.id : crypto.randomUUID();
+    const chatId = params?.id ? params.id : crypto.randomUUID();
     const nextId = messages.length + 1;
     if (!isCreatedChat) {
       dispatch(createChat(chatId));
@@ -48,7 +48,7 @@ export const ChatBox = ({ className }: Props) => {
       addMessage({ id: nextId, text: newMessage, owner: "user", chatId })
     );
     setNewMessage("");
-    if (!params.id) {
+    if (!params?.id) {
       navigate.push(`/chats/${chatId}`);
     }
 

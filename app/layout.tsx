@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { LeftBar } from "./components/LeftBar";
+import { LeftBar } from "../src/pages/chat/ui/left-bar/LeftBar";
 import { Provider } from "react-redux";
-import { store } from "./lib/store";
+import { store } from "./store/store";
 import { StoreProvider } from "./StoreProvider";
 
 const geistSans = Geist({

@@ -1,6 +1,4 @@
-import Image from "next/image";
-import { ChatBox } from "./components/ChatBox";
-import { ChatBoxHeader } from "./components/ChatBoxHeader";
+import { ChatBox, ChatBoxHeader } from "@/pages/chat/ui";
 
 export default function Home() {
   return (

@@ -1,4 +1,4 @@
-import { useAppSelector } from "@/app/lib/hooks";
+import { useAppSelector } from "../../../../../app/store/hooks";
 import Link from "next/link";
 
 export const ChatsList = () => {

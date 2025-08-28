@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ChatsList } from "./left-bar/ChatsList";
+import { ChatsList } from "./ChatsList";
 
 interface Props {
   className?: string;

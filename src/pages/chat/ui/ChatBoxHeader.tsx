@@ -1,8 +1,5 @@
 "use client";
 
-import { selectModel } from "../lib/features/models/modelsSlice";
-import { useAppDispatch, useAppSelector } from "../lib/hooks";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +7,9 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+} from "@/shared/ui/dropdown-menu";
+import { selectModel } from "../../../../app/store/models/modelsSlice";
+import { useAppDispatch, useAppSelector } from "../../../../app/store/hooks";
 
 export const ChatBoxHeader = () => {
   const dispatch = useAppDispatch();
