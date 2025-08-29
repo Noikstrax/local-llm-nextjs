@@ -8,19 +8,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/shared/ui/dropdown-menu";
-import { selectModel } from "../../../../../app/store/models/modelsSlice";
+import {
+  fetchModels,
+  selectModel,
+} from "../../../../../app/store/models/modelsSlice";
 import { useAppDispatch, useAppSelector } from "../../../../../app/store/hooks";
+import { useEffect } from "react";
 
 export const ChatBoxHeader = () => {
   const dispatch = useAppDispatch();
-  const models = useAppSelector((state) => state.models);
+  const { models, loading } = useAppSelector((state) => state.models);
   const selectedModel = models.find((model) => model.isSelected);
 
-  const getModels = async () => {
-    const res = await fetch("/api/models");
-    const models = await res.json();
-    console.log(models);
-  };
+  useEffect(() => {
+    dispatch(fetchModels());
+  }, [dispatch]);
+
+  if (loading === "pending") {
+    return <div className="ml-3">Loading models...</div>;
+  }
+  if (loading === "failed") {
+    return <div>ERROR</div>;
+  }
 
   return (
     <div className="ml-3">

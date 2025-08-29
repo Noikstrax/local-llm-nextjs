@@ -1,25 +1,64 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 export interface AiModel {
   name: string;
   isSelected: boolean;
 }
 
-const initialState: AiModel[] = [
-  { name: "gemma:2b", isSelected: true },
-  { name: "gemma:3b", isSelected: false },
-];
+interface ModelsState {
+  models: AiModel[];
+  loading: "idle" | "pending" | "succeeded" | "failed";
+}
+
+// const initialState: ModelsState = {
+//   models: [
+//     { name: "gemma:2b", isSelected: true },
+//     { name: "gemma:3b", isSelected: false },
+//   ],
+//   loading: "idle",
+// };
+
+const initialState: ModelsState = {
+  models: [],
+  loading: "idle",
+};
 export type SelectModelPayload = Pick<AiModel, "name">;
+
+export const fetchModels = createAsyncThunk("models/fetchModels", async () => {
+  console.log("fetchedData");
+  const res = await fetch("/api/models");
+  const models = await res.json();
+  const modelsData: AiModel[] = models.data.map((model: any, index: number) => {
+    return {
+      name: model.id,
+      isSelected: index === 0,
+    };
+  });
+  return modelsData;
+});
 
 export const modelsSlice = createSlice({
   name: "models",
   initialState,
   reducers: {
     selectModel: (state, action: PayloadAction<SelectModelPayload>) => {
-      state.forEach((model) => {
+      state.models.forEach((model) => {
         model.isSelected = model.name === action.payload.name;
       });
     },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchModels.pending, (state) => {
+        state.loading = "pending";
+      })
+      .addCase(fetchModels.fulfilled, (state, action) => {
+        state.models = action.payload;
+        state.loading = "succeeded";
+      })
+      .addCase(fetchModels.rejected, (state) => {
+        state.loading = "failed";
+      });
   },
 });
 

@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Message, MessageList } from "./chat-box/MessageList";
 import { SendForm } from "./chat-box/SendForm";
 import { useAppDispatch, useAppSelector } from "../../../../app/store/hooks";
@@ -16,9 +16,11 @@ export const ChatBox = ({ className }: Props) => {
   const navigate = useRouter();
   const isCreatedChat = params?.id ? true : false;
 
+  // TODO REMOVE USE EFFECT
+
   //TODO FIX THIS
   const models = useAppSelector((state) => state.models);
-  const selectedModel = models.find((model) => model.isSelected);
+  const selectedModel = models.models.find((model) => model.isSelected);
 
   const messages: Message[] = isCreatedChat
     ? useAppSelector((state) => {
@@ -40,6 +42,8 @@ export const ChatBox = ({ className }: Props) => {
     }
     const chatId = params?.id ? params.id : crypto.randomUUID();
     const nextId = messages.length + 1;
+
+    console.log(messages);
     if (!isCreatedChat) {
       dispatch(createChat(chatId));
     }
@@ -83,6 +87,12 @@ export const ChatBox = ({ className }: Props) => {
       })
     );
   };
+
+  useEffect(() => {
+    if (messages.length < 1 && isCreatedChat) {
+      navigate.push("/");
+    }
+  }, [messages, isCreatedChat, navigate]);
 
   return (
     <div className={className}>

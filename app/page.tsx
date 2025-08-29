@@ -1,4 +1,5 @@
-import { ChatBox, ChatBoxHeader } from "@/pages/chat/ui";
+import { ChatBox } from "@/pages/chat/ui";
+import { ChatBoxHeader } from "@/pages/chat/ui/chat-box";
 
 export default function Home() {
   return (
