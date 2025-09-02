@@ -3,7 +3,11 @@ import { useEffect, useState } from "react";
 import { Message, MessageList } from "./chat-box/MessageList";
 import { SendForm } from "./chat-box/SendForm";
 import { useAppDispatch, useAppSelector } from "../../../../app/store/hooks";
-import { addMessage, createChat } from "../../../../app/store/chats/chatsSlice";
+import {
+  addMessage,
+  createChat,
+  sendMessage,
+} from "../../../../app/store/chats/chatsSlice";
 import { useParams, useRouter } from "next/navigation";
 
 interface Props {
@@ -53,7 +57,13 @@ export const ChatBox = ({ className }: Props) => {
     }
 
     dispatch(
-      addMessage({ id: nextId, text: newMessage, owner: "user", chatId })
+      addMessage({
+        id: nextId,
+        text: newMessage,
+        owner: "user",
+        chatId,
+        loading: "succeeded",
+      })
     );
     setNewMessage("");
     if (!params?.id) {
@@ -61,35 +71,11 @@ export const ChatBox = ({ className }: Props) => {
     }
 
     const model = selectedModel?.name;
-    console.log(model);
-
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: newMessage, model }),
-    });
-
-    const data = await res.json();
-    if (data.error) {
-      console.error("Error");
-      return;
-    }
-    console.log(data.response);
-    let answer;
-    if (data.response) {
-      answer = data.response;
+    if (model) {
+      dispatch(sendMessage({ newMessage, model, chatId }));
     } else {
-      answer = "Error";
+      console.error("No selected model");
     }
-
-    dispatch(
-      addMessage({
-        id: nextId + 1,
-        text: cleanResponse(answer),
-        owner: "ai",
-        chatId,
-      })
-    );
   };
 
   useEffect(() => {
@@ -102,9 +88,14 @@ export const ChatBox = ({ className }: Props) => {
     <div className={className}>
       <MessageList
         messages={messages}
-        className="flex flex-col text-white gap-2 mt-10 p-2 max-h-[80vh] overflow-auto"
+        className="flex flex-col text-white gap-2 mt-10 p-2 max-h-[70vh] overflow-auto"
       />
-      <div className="flex gap-2 mt-2 h-full">
+      <div className="flex-col gap-2 mt-2 h-full justify-items-center">
+        {!isCreatedChat ? (
+          <p className="text-2xl">Чем я могу вам помочь?</p>
+        ) : (
+          ""
+        )}
         <SendForm
           onChange={onChange}
           handleSend={handleSend}

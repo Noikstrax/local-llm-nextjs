@@ -13,7 +13,7 @@ export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
         e.preventDefault();
         handleSend();
       }}
-      className="flex space-between w-full"
+      className="flex space-between w-full mt-10"
     >
       <input
         className="border px-2 py-1 rounded w-full"

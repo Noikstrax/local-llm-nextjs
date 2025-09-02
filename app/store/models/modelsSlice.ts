@@ -10,14 +10,6 @@ interface ModelsState {
   loading: "idle" | "pending" | "succeeded" | "failed";
 }
 
-// const initialState: ModelsState = {
-//   models: [
-//     { name: "gemma:2b", isSelected: true },
-//     { name: "gemma:3b", isSelected: false },
-//   ],
-//   loading: "idle",
-// };
-
 const initialState: ModelsState = {
   models: [],
   loading: "idle",
@@ -25,7 +17,6 @@ const initialState: ModelsState = {
 export type SelectModelPayload = Pick<AiModel, "name">;
 
 export const fetchModels = createAsyncThunk("models/fetchModels", async () => {
-  console.log("fetchedData");
   const res = await fetch("/api/models");
   const models = await res.json();
   const modelsData: AiModel[] = models.data.map((model: any, index: number) => {

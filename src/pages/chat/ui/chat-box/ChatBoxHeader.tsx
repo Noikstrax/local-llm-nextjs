@@ -16,7 +16,7 @@ import { useAppDispatch, useAppSelector } from "../../../../../app/store/hooks";
 import { useEffect } from "react";
 import { Skeleton } from "@/shared/ui/skeleton";
 import { Alert, AlertTitle } from "@/shared/ui/alert";
-import { AlertCircleIcon } from "lucide-react";
+import { AlertCircleIcon, Check, ChevronDown } from "lucide-react";
 
 export const ChatBoxHeader = () => {
   const dispatch = useAppDispatch();
@@ -41,7 +41,10 @@ export const ChatBoxHeader = () => {
       <div className="ml-3">
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-sm hover:bg-gray-500 px-1 py-1 hover:cursor-pointer">
-            {selectedModel?.name ?? "Model is not selected"}
+            <div className="flex">
+              {selectedModel?.name ?? "Model is not selected"}
+              <ChevronDown />
+            </div>
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             <DropdownMenuLabel>Models</DropdownMenuLabel>
@@ -58,8 +61,17 @@ export const ChatBoxHeader = () => {
                   )
                 }
               >
-                <button className="hover:cursor-pointer">
-                  {model.name} {model.isSelected ? "+" : ""}
+                <button className="hover:cursor-pointer flex">
+                  {model.name}{" "}
+                  {model.isSelected ? (
+                    <Check
+                      className="ml-1 pt-1"
+                      strokeWidth={5}
+                      absoluteStrokeWidth
+                    />
+                  ) : (
+                    ""
+                  )}
                 </button>
               </DropdownMenuItem>
             ))}
