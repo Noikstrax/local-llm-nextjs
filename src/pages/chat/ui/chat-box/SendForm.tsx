@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { text } from "stream/consumers";
 
 interface Props {
   handleSend: () => void;
@@ -32,17 +31,18 @@ export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     onChange(e.target.value);
-    if (!textareaRef.current) return;
     adjustHeight(e.target);
   };
 
   useEffect(() => {
     if (!textareaRef.current) return;
 
+    const ta = textareaRef.current;
+
     const observer = new ResizeObserver(() => {
-      adjustHeight(textareaRef.current!);
+      adjustHeight(ta);
     });
-    observer.observe(textareaRef.current);
+    observer.observe(ta);
 
     return () => observer.disconnect();
   }, []);
