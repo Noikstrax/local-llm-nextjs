@@ -88,7 +88,7 @@ export const ChatBox = ({ className }: Props) => {
     <div className={className}>
       <MessageList
         messages={messages}
-        className="flex flex-col text-white gap-2 mt-10 p-2 max-h-[70vh] overflow-auto"
+        className="flex flex-col text-white gap-2 mt-10 p-2 max-h-[50vh] overflow-auto"
       />
       <div className="flex-col gap-2 mt-2 h-full justify-items-center">
         {!isCreatedChat ? (

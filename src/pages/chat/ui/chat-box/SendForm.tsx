@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { useAppSelector } from "../../../../../app/store/hooks";
+import { cn } from "@/lib/utils";
 
 interface Props {
   handleSend: () => void;
@@ -9,6 +11,8 @@ interface Props {
 }
 
 export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
+  const { loading } = useAppSelector((state) => state.models);
+  const isButtonDisabled = loading === "failed" ? true : false;
   const adjustHeight = (ta: HTMLTextAreaElement) => {
     ta.style.height = "auto";
 
@@ -69,8 +73,13 @@ export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
         </div>
         <div className="flex justify-end">
           <button
-            className="bg-blue-500 text-white px-4 py-1 rounded cursor-pointer row-end-1"
+            className={cn(
+              isButtonDisabled
+                ? "bg-gray-800 text-white px-4 py-1 rounded cursor-pointer row-end-1 opacity-60 hover:bg-red-500"
+                : "bg-blue-500 text-white px-4 py-1 rounded cursor-pointer row-end-1 hover:bg-green-500"
+            )}
             type="submit"
+            disabled={isButtonDisabled}
           >
             Send
           </button>
