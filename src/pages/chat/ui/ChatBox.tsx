@@ -39,10 +39,6 @@ export const ChatBox = ({ className }: Props) => {
     setNewMessage(newMessage);
   };
 
-  function cleanResponse(text: string): string {
-    return text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
-  }
-
   const handleSend = async () => {
     if (newMessage.trim() === "") {
       console.log("message is missing");
