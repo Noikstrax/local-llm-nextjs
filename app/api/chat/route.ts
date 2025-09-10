@@ -1,4 +1,6 @@
+import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
+
 export async function POST(req: NextRequest) {
   try {
     const LLM_HOST = process.env.LLM_HOST;

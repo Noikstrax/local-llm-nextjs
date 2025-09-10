@@ -9,33 +9,33 @@ datasource db {
     directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
-model User {
+model Users {
     id Int @id @default(autoincrement())
     name String
     email String
     password String
 
-    chats Chat[]
+    chats Chats[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 }
 
-model Chat {
+model Chats {
     chatId String @id @unique
     title String
 
-    user User @relation(fields: [userId], references: [id])
+    user Users @relation(fields: [userId], references: [id])
     userId Int @unique
 
 
-    messages Message[]
+    messages Messages[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
 }
 
-model Message {
+model Messages {
     id Int @id @default(autoincrement())
 
     text String
@@ -43,7 +43,7 @@ model Message {
     loading String
 
     chatId String
-    chat Chat @relation(fields: [chatId], references: [chatId])
+    chat Chats @relation(fields: [chatId], references: [chatId])
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

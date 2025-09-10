@@ -8,12 +8,24 @@ function cleanResponse(text: string): string {
 
 export interface Chat {
   chatId: string;
+  title: string;
   messages: Message[];
 }
+
+export const fetchChats = createAsyncThunk<Chat[]>(
+  "chats/fetchChats",
+  async () => {
+    const res = await fetch("/api/chats");
+    if (!res.ok) throw new Error("Error chats loading");
+    const data: Chat[] = await res.json();
+    return data;
+  }
+);
 
 const initialState: Chat[] = [
   {
     chatId: "1",
+    title: "User question",
     messages: [
       { id: 1, text: "User question", owner: "user", loading: "succeeded" },
       {
@@ -26,6 +38,7 @@ const initialState: Chat[] = [
   },
   {
     chatId: "2",
+    title: "User question 2",
     messages: [
       { id: 1, text: "User question 2", owner: "user", loading: "succeeded" },
       {
@@ -115,6 +128,7 @@ export const chatsSlice = createSlice({
     createChat: (state, action: PayloadAction<string>) => {
       state.push({
         chatId: action.payload,
+        title: `Chat:${action.payload}`,
         messages: [],
       });
     },
@@ -159,6 +173,12 @@ export const chatsSlice = createSlice({
             aiMessage.loading = "failed";
           }
         }
+      })
+      .addCase(fetchChats.fulfilled, (state, action) => {
+        state.push(...action.payload);
+      })
+      .addCase(fetchChats.rejected, (state, action) => {
+        console.error("Ошибка загрузки чатов:", action.error);
       });
   },
 });

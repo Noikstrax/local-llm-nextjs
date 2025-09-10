@@ -7,6 +7,9 @@ export type Message = {
   text: string;
   owner: "user" | "ai";
   loading: "idle" | "pending" | "succeeded" | "failed";
+  createdAt?: string;
+  updatedAt?: string;
+  chatId?: string;
 };
 
 interface Props {
@@ -15,6 +18,7 @@ interface Props {
 }
 
 export const MessageList = ({ messages, className }: Props) => {
+  console.log(messages);
   return (
     <div className={className}>
       {messages.map((message) => {
