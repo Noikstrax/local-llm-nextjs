@@ -92,6 +92,18 @@ export type MessagePayload = Message & {
   chatId: string;
 };
 
+// export const asyncCreateChat = createAsyncThunk<Chat>(
+//   "chats/asyncCreateChat",
+//   async () => {
+
+//     return {
+//       chatId: 1,
+//       title: "",
+//       messages: [],
+//     };
+//   }
+// );
+
 export const sendMessage = createAsyncThunk<
   { chatId: string; answer: string },
   { newMessage: string; model: string; chatId: string }

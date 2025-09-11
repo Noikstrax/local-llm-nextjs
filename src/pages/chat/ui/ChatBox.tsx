@@ -48,6 +48,10 @@ export const ChatBox = ({ className }: Props) => {
     const nextId = messages.length + 1;
     if (!isCreatedChat) {
       dispatch(createChat(chatId));
+      fetch("/api/chat/createChat", {
+        method: "POST",
+        body: JSON.stringify({ chatId: chatId }),
+      });
     }
 
     dispatch(
