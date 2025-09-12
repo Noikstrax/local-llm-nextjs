@@ -50,7 +50,10 @@ export const ChatBox = ({ className }: Props) => {
       dispatch(createChat(chatId));
       fetch("/api/chat/createChat", {
         method: "POST",
-        body: JSON.stringify({ chatId: chatId }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ chatId }),
       });
     }
 
