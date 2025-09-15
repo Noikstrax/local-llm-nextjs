@@ -7,7 +7,7 @@ function cleanResponse(text: string): string {
 }
 
 export interface ChatsState {
-  isLoading: "loading" | "succeeded" | "failed";
+  isLoading: "pending" | "succeeded" | "failed";
   chats: Chat[];
 }
 
@@ -94,7 +94,7 @@ const initialStateChats: Chat[] = [
 ];
 
 const initialState: ChatsState = {
-  isLoading: "loading",
+  isLoading: "pending",
   chats: initialStateChats,
 };
 
@@ -137,7 +137,7 @@ export const sendMessage = createAsyncThunk<
     const res = await fetch("/api/chat", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ prompt: newMessage, model }),
+      body: JSON.stringify({ prompt: newMessage, model, chatId }),
     });
 
     const data = await res.json();
@@ -210,6 +210,13 @@ export const chatsSlice = createSlice({
       })
       .addCase(fetchChats.rejected, (state, action) => {
         console.error("Ошибка загрузки чатов:", action.error);
+      })
+      .addCase(asyncCreateChat.pending, (state) => {
+        state.isLoading = "pending";
+      })
+      .addCase(asyncCreateChat.fulfilled, (state, action) => {
+        state.isLoading = "succeeded";
+        state.chats.push(action.payload);
       });
   },
 });

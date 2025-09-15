@@ -1,4 +1,9 @@
+import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
+
+function cleanResponse(text: string): string {
+  return text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -10,7 +15,7 @@ export async function POST(req: NextRequest) {
       });
     }
     const body = await req.json();
-    const { prompt, model } = body;
+    const { prompt, model, chatId } = body;
     if (!prompt) {
       return NextResponse.json({
         error: true,
@@ -35,6 +40,32 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await ollamaRes.json();
+
+    const postResult = await prisma.messages.create({
+      data: {
+        text: prompt,
+        chatId,
+        owner: "user",
+        loading: "succeeded",
+      },
+    });
+
+    if (!postResult) {
+      throw new Error(`[DB_POST_ERROR] for question in Chat: ${chatId}`);
+    }
+
+    const prismaResult = await prisma.messages.create({
+      data: {
+        text: cleanResponse(result.response),
+        chatId,
+        owner: "ai",
+        loading: "succeeded",
+      },
+    });
+
+    if (!prismaResult) {
+      throw new Error(`[DB_POST_ERROR] for answer in Chat: ${chatId}`);
+    }
 
     return NextResponse.json(result);
   } catch (e) {

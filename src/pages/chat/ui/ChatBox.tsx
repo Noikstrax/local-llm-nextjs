@@ -50,7 +50,7 @@ export const ChatBox = ({ className }: Props) => {
     const chatId = params?.id ? params.id : crypto.randomUUID();
     const nextId = messages.length + 1;
     if (!isCreatedChat) {
-      dispatch(createChat(chatId));
+      //dispatch(createChat(chatId));
       dispatch(asyncCreateChat(chatId));
     }
 
