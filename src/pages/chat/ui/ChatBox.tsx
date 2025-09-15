@@ -5,6 +5,7 @@ import { SendForm } from "./chat-box/SendForm";
 import { useAppDispatch, useAppSelector } from "../../../../app/store/hooks";
 import {
   addMessage,
+  asyncCreateChat,
   createChat,
   sendMessage,
 } from "../../../../app/store/chats/chatsSlice";
@@ -28,7 +29,9 @@ export const ChatBox = ({ className }: Props) => {
 
   const messages: Message[] = isCreatedChat
     ? useAppSelector((state) => {
-        const chat = state.chats.find((chat) => chat.chatId === params?.id);
+        const chat = state.chats.chats.find(
+          (chat) => chat.chatId === params?.id
+        );
         return chat ? chat.messages : [];
       })
     : [];
@@ -48,13 +51,7 @@ export const ChatBox = ({ className }: Props) => {
     const nextId = messages.length + 1;
     if (!isCreatedChat) {
       dispatch(createChat(chatId));
-      fetch("/api/chat/createChat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ chatId }),
-      });
+      dispatch(asyncCreateChat(chatId));
     }
 
     dispatch(
@@ -66,6 +63,7 @@ export const ChatBox = ({ className }: Props) => {
         loading: "succeeded",
       })
     );
+
     setNewMessage("");
     if (!params?.id) {
       navigate.push(`/chats/${chatId}`);

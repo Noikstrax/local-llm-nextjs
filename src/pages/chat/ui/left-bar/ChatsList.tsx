@@ -1,11 +1,14 @@
 import { useEffect, useState } from "react";
-import { useAppDispatch, useAppSelector } from "../../../../../app/store/hooks";
 import Link from "next/link";
-import { Chat, fetchChats } from "../../../../../app/store/chats/chatsSlice";
+import {
+  fetchChats,
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../app/store";
 
 export const ChatsList = () => {
   const dispatch = useAppDispatch();
-  const chats = useAppSelector((state) => state.chats);
+  const chats = useAppSelector((state) => state.chats.chats);
 
   useEffect(() => {
     dispatch(fetchChats());

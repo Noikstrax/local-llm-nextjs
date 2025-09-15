@@ -6,6 +6,11 @@ function cleanResponse(text: string): string {
   return text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
 }
 
+export interface ChatsState {
+  isLoading: "loading" | "succeeded" | "failed";
+  chats: Chat[];
+}
+
 export interface Chat {
   chatId: string;
   title: string;
@@ -22,7 +27,7 @@ export const fetchChats = createAsyncThunk<Chat[]>(
   }
 );
 
-const initialState: Chat[] = [
+const initialStateChats: Chat[] = [
   {
     chatId: "1",
     title: "User question",
@@ -88,21 +93,35 @@ const initialState: Chat[] = [
   },
 ];
 
+const initialState: ChatsState = {
+  isLoading: "loading",
+  chats: initialStateChats,
+};
+
 export type MessagePayload = Message & {
   chatId: string;
 };
 
-// export const asyncCreateChat = createAsyncThunk<Chat>(
-//   "chats/asyncCreateChat",
-//   async () => {
+export const asyncCreateChat = createAsyncThunk<Chat, string>(
+  "chats/asyncCreateChat",
+  async (chatId) => {
+    const req = await fetch("/api/chat/createChat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ chatId }),
+    });
 
-//     return {
-//       chatId: 1,
-//       title: "",
-//       messages: [],
-//     };
-//   }
-// );
+    const res = await req.json();
+
+    return {
+      chatId: res.chatId,
+      title: res.title,
+      messages: [],
+    };
+  }
+);
 
 export const sendMessage = createAsyncThunk<
   { chatId: string; answer: string },
@@ -131,14 +150,14 @@ export const chatsSlice = createSlice({
   initialState,
   reducers: {
     addMessage: (state, action: PayloadAction<MessagePayload>) => {
-      state.map((chat) => {
+      state.chats.map((chat) => {
         chat.chatId === action.payload.chatId
           ? chat.messages.push(action.payload)
           : chat;
       });
     },
     createChat: (state, action: PayloadAction<string>) => {
-      state.push({
+      state.chats.push({
         chatId: action.payload,
         title: `Chat:${action.payload}`,
         messages: [],
@@ -149,7 +168,7 @@ export const chatsSlice = createSlice({
     builder
       .addCase(sendMessage.pending, (state, action) => {
         const { chatId } = action.meta.arg;
-        const chat = state.find((chat) => chat.chatId === chatId);
+        const chat = state.chats.find((chat) => chat.chatId === chatId);
         if (chat) {
           const nextId = chat.messages.length + 1;
           chat.messages.push({
@@ -162,7 +181,7 @@ export const chatsSlice = createSlice({
       })
       .addCase(sendMessage.fulfilled, (state, action) => {
         const { chatId, answer } = action.payload;
-        const chat = state.find((chat) => chat.chatId === chatId);
+        const chat = state.chats.find((chat) => chat.chatId === chatId);
         if (chat) {
           const aiMessage = chat.messages.find(
             (message) => message.owner === "ai" && message.loading === "pending"
@@ -175,7 +194,7 @@ export const chatsSlice = createSlice({
       })
       .addCase(sendMessage.rejected, (state, action) => {
         const { chatId } = action.meta.arg;
-        const chat = state.find((chat) => chat.chatId === chatId);
+        const chat = state.chats.find((chat) => chat.chatId === chatId);
         if (chat) {
           const aiMessage = chat.messages.find(
             (message) => message.owner === "ai" && message.loading === "pending"
@@ -187,7 +206,7 @@ export const chatsSlice = createSlice({
         }
       })
       .addCase(fetchChats.fulfilled, (state, action) => {
-        state.push(...action.payload);
+        state.chats.push(...action.payload);
       })
       .addCase(fetchChats.rejected, (state, action) => {
         console.error("Ошибка загрузки чатов:", action.error);
