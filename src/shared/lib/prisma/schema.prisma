@@ -36,7 +36,7 @@ model Chats {
 }
 
 model Messages {
-    id Int @id @default(autoincrement())
+    id String @id @default(uuid())
 
     text String
     owner String
