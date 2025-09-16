@@ -21,6 +21,10 @@ export const ChatBox = ({ className }: Props) => {
   const navigate = useRouter();
   const isCreatedChat = params?.id ? true : false;
 
+  const chat = useAppSelector((state) =>
+    state.chats.chats.find((c) => c.chatId === params?.id)
+  );
+
   // TODO REMOVE USE EFFECT
 
   //TODO FIX THIS
@@ -48,10 +52,16 @@ export const ChatBox = ({ className }: Props) => {
       return;
     }
     const chatId = params?.id ? params.id : crypto.randomUUID();
-    const nextId = messages.length + 1;
+    const nextId = crypto.randomUUID();
+
+    let chatCreated = true;
     if (!isCreatedChat) {
-      //dispatch(createChat(chatId));
-      dispatch(asyncCreateChat(chatId));
+      const result = await dispatch(asyncCreateChat(chatId));
+      chatCreated = result.meta.requestStatus === "fulfilled";
+      if (!chatCreated) {
+        console.error("Failed to create chat");
+        return;
+      }
     }
 
     dispatch(
@@ -64,24 +74,58 @@ export const ChatBox = ({ className }: Props) => {
       })
     );
 
-    setNewMessage("");
-    if (!params?.id) {
-      navigate.push(`/chats/${chatId}`);
-    }
-
     const model = selectedModel?.name;
     if (model) {
       dispatch(sendMessage({ newMessage, model, chatId }));
     } else {
       console.error("No selected model");
     }
+
+    setNewMessage("");
+
+    if (!isCreatedChat) {
+      navigate.push(`/chats/${chatId}`);
+    }
   };
+  // useEffect(() => {
+  //   if (!isCreatedChat) {
+  //     navigate.push("/");
+  //   } else {
+  //     const fetchMessages = async () => {
+  //       const messages = await fetch(
+  //         `/api/chat/messages/getMessages?id=${params?.id}`
+  //       );
+  //       const res = await messages.json();
+
+  //       if (res.length < 1) navigate.push("/");
+  //     };
+  //     fetchMessages();
+  //   }
+  // }, [isCreatedChat, navigate, params?.id]);
 
   useEffect(() => {
-    if (messages.length < 1 && isCreatedChat) {
-      navigate.push("/");
-    }
-  }, [messages, isCreatedChat, navigate]);
+    if (!params?.id && !chat) return;
+
+    // const checkChatExists = async () => {
+    //   try {
+    //     const response = await fetch(
+    //       `/api/chat/messages/getMessages?id=${params?.id}`
+    //     );
+
+    //     const data = await response.json();
+    //     console.log("data useEff:", data);
+
+    //     if (!data || data.length < 1) {
+    //       navigate.push("/");
+    //     }
+    //   } catch (e) {
+    //     console.error("Failed to fetch messages:", e);
+    //     navigate.push("/");
+    //   }
+    // };
+
+    // checkChatExists();
+  }, [chat, params?.id, navigate]);
 
   return (
     <div className={className}>
