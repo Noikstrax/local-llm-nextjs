@@ -170,10 +170,10 @@ export const chatsSlice = createSlice({
         const { chatId } = action.meta.arg;
         const chat = state.chats.find((chat) => chat.chatId === chatId);
         if (chat) {
-          const nextId = chat.messages.length + 1;
+          const nextId = crypto.randomUUID();
           chat.messages.push({
             id: nextId,
-            text: "",
+            text: "loading",
             owner: "ai",
             loading: "pending",
           });
@@ -206,7 +206,8 @@ export const chatsSlice = createSlice({
         }
       })
       .addCase(fetchChats.fulfilled, (state, action) => {
-        state.chats.push(...action.payload);
+        state.chats = action.payload;
+        state.isLoading = "succeeded";
       })
       .addCase(fetchChats.rejected, (state, action) => {
         console.error("Ошибка загрузки чатов:", action.error);
