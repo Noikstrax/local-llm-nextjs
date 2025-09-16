@@ -3,7 +3,7 @@
 import { Skeleton } from "@/shared/ui/skeleton";
 
 export type Message = {
-  id: number;
+  id: number | string;
   text: string;
   owner: "user" | "ai";
   loading: "idle" | "pending" | "succeeded" | "failed";
@@ -67,7 +67,7 @@ export const MessageList = ({ messages, className }: Props) => {
           return (
             <Skeleton
               key={message.id}
-              className="ml-3 h-[32px] w-[85px] rounded-sm bg-gray-500"
+              className="ml-3 min-h-[32px] w-[85px] rounded-sm bg-gray-500"
             />
           );
         }
