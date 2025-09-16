@@ -87,44 +87,9 @@ export const ChatBox = ({ className }: Props) => {
       navigate.push(`/chats/${chatId}`);
     }
   };
-  // useEffect(() => {
-  //   if (!isCreatedChat) {
-  //     navigate.push("/");
-  //   } else {
-  //     const fetchMessages = async () => {
-  //       const messages = await fetch(
-  //         `/api/chat/messages/getMessages?id=${params?.id}`
-  //       );
-  //       const res = await messages.json();
-
-  //       if (res.length < 1) navigate.push("/");
-  //     };
-  //     fetchMessages();
-  //   }
-  // }, [isCreatedChat, navigate, params?.id]);
 
   useEffect(() => {
     if (!params?.id && !chat) return;
-
-    // const checkChatExists = async () => {
-    //   try {
-    //     const response = await fetch(
-    //       `/api/chat/messages/getMessages?id=${params?.id}`
-    //     );
-
-    //     const data = await response.json();
-    //     console.log("data useEff:", data);
-
-    //     if (!data || data.length < 1) {
-    //       navigate.push("/");
-    //     }
-    //   } catch (e) {
-    //     console.error("Failed to fetch messages:", e);
-    //     navigate.push("/");
-    //   }
-    // };
-
-    // checkChatExists();
   }, [chat, params?.id, navigate]);
 
   return (
