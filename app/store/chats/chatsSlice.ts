@@ -32,9 +32,9 @@ const initialStateChats: Chat[] = [
     chatId: "1",
     title: "User question",
     messages: [
-      { id: 1, text: "User question", owner: "user", loading: "succeeded" },
+      { id: "1", text: "User question", owner: "user", loading: "succeeded" },
       {
-        id: 2,
+        id: "2",
         text: "Ai answer",
         owner: "ai",
         loading: "succeeded",
@@ -45,33 +45,33 @@ const initialStateChats: Chat[] = [
     chatId: "2",
     title: "User question 2",
     messages: [
-      { id: 1, text: "User question 2", owner: "user", loading: "succeeded" },
+      { id: "1", text: "User question 2", owner: "user", loading: "succeeded" },
       {
-        id: 2,
+        id: "2",
         text: "Ai answer 2",
         owner: "ai",
         loading: "succeeded",
       },
       {
-        id: 3,
+        id: "3",
         text: "Hello!",
         owner: "user",
         loading: "succeeded",
       },
       {
-        id: 4,
+        id: "4",
         text: "Hello! How can I assist you today? 😊",
         owner: "ai",
         loading: "succeeded",
       },
       {
-        id: 5,
+        id: "5",
         text: "Hello! How can I assist you today? 😊",
         owner: "user",
         loading: "succeeded",
       },
       {
-        id: 6,
+        id: "6",
         text: `Certainly! Here's an organized and elegant introduction based on your thoughts: --- 
         **Introduction** Mathematics is more than just a set of equations; it’s a language that helps us 
         understand patterns, relationships, and the structure of the universe. From the intricate designs in art 
@@ -141,6 +141,30 @@ export const sendMessage = createAsyncThunk<
     });
 
     const data = await res.json();
+    return { chatId, answer: cleanResponse(data.response ?? "Error") };
+  }
+);
+
+export const resendMessage = createAsyncThunk<
+  { chatId: string; answer: string },
+  {
+    messageId: string;
+    chatId: string;
+  }
+>(
+  "chats/resendMessage",
+  async (messageData: { messageId: string; chatId: string }) => {
+    const { messageId, chatId } = messageData;
+    const res = await fetch("/api/chat/messages/resendMessage", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ messageId, chatId }),
+    });
+
+    const data = await res.json();
+
     return { chatId, answer: cleanResponse(data.response ?? "Error") };
   }
 );
@@ -218,6 +242,45 @@ export const chatsSlice = createSlice({
       .addCase(asyncCreateChat.fulfilled, (state, action) => {
         state.isLoading = "succeeded";
         state.chats.push(action.payload);
+      })
+      .addCase(resendMessage.pending, (state, action) => {
+        const { chatId } = action.meta.arg;
+        const chat = state.chats.find((chat) => chat.chatId === chatId);
+        if (chat) {
+          const nextId = crypto.randomUUID();
+          chat.messages.push({
+            id: nextId,
+            text: "loading",
+            owner: "ai",
+            loading: "pending",
+          });
+        }
+      })
+      .addCase(resendMessage.fulfilled, (state, action) => {
+        const { chatId, answer } = action.payload;
+        const chat = state.chats.find((chat) => chat.chatId === chatId);
+        if (chat) {
+          const aiMessage = chat.messages.find(
+            (message) => message.owner === "ai" && message.loading === "pending"
+          );
+          if (aiMessage) {
+            aiMessage.text = answer;
+            aiMessage.loading = "succeeded";
+          }
+        }
+      })
+      .addCase(resendMessage.rejected, (state, action) => {
+        const { chatId } = action.meta.arg;
+        const chat = state.chats.find((chat) => chat.chatId === chatId);
+        if (chat) {
+          const aiMessage = chat.messages.find(
+            (message) => message.owner === "ai" && message.loading === "pending"
+          );
+          if (aiMessage) {
+            aiMessage.text = "Ошибка при получении ответа";
+            aiMessage.loading = "failed";
+          }
+        }
       });
   },
 });

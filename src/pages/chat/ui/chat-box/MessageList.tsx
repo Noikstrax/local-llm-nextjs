@@ -1,9 +1,10 @@
 "use client";
 
 import { Skeleton } from "@/shared/ui/skeleton";
+import { resendMessage, useAppDispatch } from "../../../../../app/store";
 
 export type Message = {
-  id: number | string;
+  id: string;
   text: string;
   owner: "user" | "ai";
   loading: "idle" | "pending" | "succeeded" | "failed";
@@ -17,8 +18,25 @@ interface Props {
   messages: Message[];
 }
 
+async function retrySendMessage(
+  messageId: string | number,
+  chatId: string | number
+) {
+  const body = {
+    messageId,
+    chatId,
+  };
+  await fetch("/api/chat/messages/resendMessage", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(body),
+  });
+}
+
 export const MessageList = ({ messages, className }: Props) => {
-  console.log(messages);
+  const dispatch = useAppDispatch();
   return (
     <div className={className}>
       {messages.map((message) => {
@@ -61,6 +79,20 @@ export const MessageList = ({ messages, className }: Props) => {
               }`}
             >
               {message.text}
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                  if (!message.id || !message.chatId) return;
+                  dispatch(
+                    resendMessage({
+                      messageId: message.id,
+                      chatId: message.chatId,
+                    })
+                  );
+                }}
+              >
+                Retry
+              </button>
             </div>
           );
         } else if (messageStatus === "pending") {
