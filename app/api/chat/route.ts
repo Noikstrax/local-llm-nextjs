@@ -22,6 +22,21 @@ export async function POST(req: NextRequest) {
         message: "User prompt is missing",
       });
     }
+
+    const postResult = await prisma.messages.create({
+      data: {
+        text: prompt,
+        chatId,
+        owner: "user",
+        loading: "succeeded",
+        model,
+      },
+    });
+
+    if (!postResult) {
+      throw new Error(`[DB_POST_ERROR] for question in Chat: ${chatId}`);
+    }
+
     const ollamaPayload = {
       model,
       prompt,
@@ -36,23 +51,18 @@ export async function POST(req: NextRequest) {
 
     if (!ollamaRes.ok) {
       const error = await ollamaRes.text();
+      await prisma.messages.update({
+        data: {
+          loading: "failed",
+        },
+        where: {
+          id: postResult.id,
+        },
+      });
       throw new Error(`[OLLAMA_FETCH_GENERATE] Server Error: ${error}`);
     }
 
     const result = await ollamaRes.json();
-
-    const postResult = await prisma.messages.create({
-      data: {
-        text: prompt,
-        chatId,
-        owner: "user",
-        loading: "succeeded",
-      },
-    });
-
-    if (!postResult) {
-      throw new Error(`[DB_POST_ERROR] for question in Chat: ${chatId}`);
-    }
 
     const prismaResult = await prisma.messages.create({
       data: {
@@ -60,6 +70,7 @@ export async function POST(req: NextRequest) {
         chatId,
         owner: "ai",
         loading: "succeeded",
+        model,
       },
     });
 
