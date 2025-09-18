@@ -2,6 +2,7 @@
 
 import { Skeleton } from "@/shared/ui/skeleton";
 import { resendMessage, useAppDispatch } from "../../../../../app/store";
+import { RotateCw } from "lucide-react";
 
 export type Message = {
   id: string;
@@ -66,6 +67,7 @@ export const MessageList = ({ messages, className }: Props) => {
             <div
               key={message.id}
               className={`
+              flex
               my-5
               rounded-xl
               max-w-full
@@ -82,7 +84,12 @@ export const MessageList = ({ messages, className }: Props) => {
               <button
                 onClick={(e) => {
                   e.preventDefault();
-                  if (!message.id || !message.chatId) return;
+                  const currentButton = e.currentTarget as HTMLButtonElement;
+                  currentButton.classList.add("animate-spin");
+                  if (!message.id || !message.chatId) {
+                    currentButton.classList.remove("animate-spin");
+                    return;
+                  }
                   dispatch(
                     resendMessage({
                       messageId: message.id,
@@ -90,8 +97,9 @@ export const MessageList = ({ messages, className }: Props) => {
                     })
                   );
                 }}
+                className="ml-2"
               >
-                Retry
+                <RotateCw />
               </button>
             </div>
           );
