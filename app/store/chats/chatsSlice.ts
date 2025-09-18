@@ -146,7 +146,7 @@ export const sendMessage = createAsyncThunk<
 );
 
 export const resendMessage = createAsyncThunk<
-  { chatId: string; answer: string },
+  { chatId: string; answer: string; messageId: string },
   {
     messageId: string;
     chatId: string;
@@ -165,7 +165,11 @@ export const resendMessage = createAsyncThunk<
 
     const data = await res.json();
 
-    return { chatId, answer: cleanResponse(data.response ?? "Error") };
+    return {
+      chatId,
+      answer: cleanResponse(data.response ?? "Error"),
+      messageId,
+    };
   }
 );
 
@@ -257,15 +261,19 @@ export const chatsSlice = createSlice({
         }
       })
       .addCase(resendMessage.fulfilled, (state, action) => {
-        const { chatId, answer } = action.payload;
+        const { chatId, answer, messageId } = action.payload;
         const chat = state.chats.find((chat) => chat.chatId === chatId);
         if (chat) {
           const aiMessage = chat.messages.find(
             (message) => message.owner === "ai" && message.loading === "pending"
           );
-          if (aiMessage) {
+          const userMessage = chat.messages.find(
+            (message) => message.id === messageId
+          );
+          if (aiMessage && userMessage) {
             aiMessage.text = answer;
             aiMessage.loading = "succeeded";
+            userMessage.loading = "succeeded";
           }
         }
       })
