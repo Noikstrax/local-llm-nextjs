@@ -2,6 +2,8 @@
 
 import { Skeleton } from "@/shared/ui/skeleton";
 import { FailedMessage } from "./messages-list/FailedMessage";
+import { SuccessfulMessage } from "./messages-list/SuccessfulMessage";
+import { PendingMessage } from "./messages-list/PendingMessage";
 
 export type Message = {
   id: string;
@@ -26,34 +28,14 @@ export const MessageList = ({ messages, className }: Props) => {
         const messageStatus = message.loading;
         if (messageStatus === "succeeded") {
           return (
-            <div
-              key={message.id}
-              className={`
-              my-5
-              rounded-xl
-              max-w-full
-              text-justify
-              prose prose-invert
-              ${
-                isAi
-                  ? "self-start"
-                  : "self-end bg-zinc-800 px-5 py-3 rounded-xl my-5"
-              }`}
-            >
-              {message.text}
-            </div>
+            <SuccessfulMessage key={message.id} message={message} isAi={isAi} />
           );
         } else if (messageStatus === "failed") {
           return (
             <FailedMessage key={message.id} message={message} isAi={isAi} />
           );
         } else if (messageStatus === "pending") {
-          return (
-            <Skeleton
-              key={message.id}
-              className="ml-3 min-h-[32px] w-[85px] rounded-sm bg-gray-500"
-            />
-          );
+          return <PendingMessage key={message.id} message={message} />;
         }
       })}
     </div>
