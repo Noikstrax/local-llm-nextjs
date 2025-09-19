@@ -3,6 +3,7 @@
 import { Skeleton } from "@/shared/ui/skeleton";
 import { resendMessage, useAppDispatch } from "../../../../../app/store";
 import { RotateCw } from "lucide-react";
+import { FailedMessage } from "./messages-list/FailedMessage";
 
 export type Message = {
   id: string;
@@ -64,44 +65,7 @@ export const MessageList = ({ messages, className }: Props) => {
           );
         } else if (messageStatus === "failed") {
           return (
-            <div
-              key={message.id}
-              className={`
-              flex
-              my-5
-              rounded-xl
-              max-w-full
-              text-justify
-              text-red-500
-              prose prose-invert
-              ${
-                isAi
-                  ? "self-start"
-                  : "self-end bg-zinc-800 px-5 py-3 rounded-xl my-5"
-              }`}
-            >
-              {message.text}
-              <button
-                onClick={(e) => {
-                  e.preventDefault();
-                  const currentButton = e.currentTarget as HTMLButtonElement;
-                  currentButton.classList.add("animate-spin");
-                  if (!message.id || !message.chatId) {
-                    currentButton.classList.remove("animate-spin");
-                    return;
-                  }
-                  dispatch(
-                    resendMessage({
-                      messageId: message.id,
-                      chatId: message.chatId,
-                    })
-                  );
-                }}
-                className="ml-2"
-              >
-                <RotateCw />
-              </button>
-            </div>
+            <FailedMessage key={message.id} message={message} isAi={isAi} />
           );
         } else if (messageStatus === "pending") {
           return (
