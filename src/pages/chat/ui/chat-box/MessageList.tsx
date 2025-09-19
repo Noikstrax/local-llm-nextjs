@@ -1,8 +1,6 @@
 "use client";
 
 import { Skeleton } from "@/shared/ui/skeleton";
-import { resendMessage, useAppDispatch } from "../../../../../app/store";
-import { RotateCw } from "lucide-react";
 import { FailedMessage } from "./messages-list/FailedMessage";
 
 export type Message = {
@@ -20,25 +18,7 @@ interface Props {
   messages: Message[];
 }
 
-async function retrySendMessage(
-  messageId: string | number,
-  chatId: string | number
-) {
-  const body = {
-    messageId,
-    chatId,
-  };
-  await fetch("/api/chat/messages/resendMessage", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify(body),
-  });
-}
-
 export const MessageList = ({ messages, className }: Props) => {
-  const dispatch = useAppDispatch();
   return (
     <div className={className}>
       {messages.map((message) => {
