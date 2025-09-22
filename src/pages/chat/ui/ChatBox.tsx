@@ -6,6 +6,7 @@ import { useAppDispatch, useAppSelector } from "../../../../app/store/hooks";
 import {
   addMessage,
   asyncCreateChat,
+  Chat,
   createChat,
   sendMessage,
 } from "../../../../app/store/chats/chatsSlice";
@@ -24,8 +25,6 @@ export const ChatBox = ({ className }: Props) => {
   const chat = useAppSelector((state) =>
     state.chats.chats.find((c) => c.chatId === params?.id)
   );
-
-  // TODO REMOVE USE EFFECT
 
   //TODO FIX THIS
   const models = useAppSelector((state) => state.models);
@@ -90,6 +89,32 @@ export const ChatBox = ({ className }: Props) => {
 
   useEffect(() => {
     if (!params?.id && !chat) return;
+
+    const fetchMessages = async () => {
+      if (params?.id) {
+        try {
+          const res = await fetch(
+            `/api/chat/messages/getMessages?id=${params.id}`
+          );
+          if (!res.ok) {
+            navigate.push("/");
+            return;
+          }
+
+          const messages = await res.json();
+
+          if (!messages || messages.length === 0) {
+            navigate.push("/");
+            return;
+          }
+        } catch (e) {
+          console.error("Failed to fetch messages", e);
+          navigate.push("/");
+        }
+      }
+    };
+
+    fetchMessages();
   }, [chat, params?.id, navigate]);
 
   return (
