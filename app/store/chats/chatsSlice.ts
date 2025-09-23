@@ -141,7 +141,7 @@ export const sendMessage = createAsyncThunk<
     });
 
     const data = await res.json();
-    return { chatId, answer: cleanResponse(data.response ?? "Error") };
+    return { chatId, answer: data.response ?? "Error" };
   }
 );
 
@@ -167,9 +167,57 @@ export const resendMessage = createAsyncThunk<
 
     return {
       chatId,
-      answer: cleanResponse(data.response ?? "Error"),
+      answer: data.response ?? "Error",
       messageId,
     };
+  }
+);
+
+export const streamMessage = createAsyncThunk<
+  void,
+  { newMessage: string; model: string; chatId: string }
+>(
+  "chats/streamMessage",
+  async ({ newMessage, model, chatId }, { dispatch }) => {
+    const msgId = crypto.randomUUID();
+
+    dispatch(
+      addMessage({
+        id: msgId,
+        text: "",
+        owner: "ai",
+        chatId,
+        loading: "succeeded",
+      })
+    );
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      body: JSON.stringify({ prompt: newMessage, model, chatId }),
+    });
+
+    if (!res.body) throw new Error("No response body");
+
+    const reader = res.body.getReader();
+    const decoder = new TextDecoder();
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+
+      const chunk = decoder.decode(value);
+
+      dispatch(
+        addMessage({
+          id: msgId,
+          text: chunk,
+          owner: "ai",
+          chatId,
+          append: true,
+          loading: "succeeded",
+        })
+      );
+    }
   }
 );
 
@@ -177,11 +225,32 @@ export const chatsSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
-    addMessage: (state, action: PayloadAction<MessagePayload>) => {
-      state.chats.map((chat) => {
-        chat.chatId === action.payload.chatId
-          ? chat.messages.push(action.payload)
-          : chat;
+    addMessage: (
+      state,
+      action: PayloadAction<MessagePayload & { append?: boolean }>
+    ) => {
+      state.chats.forEach((chat) => {
+        if (chat.chatId === action.payload.chatId) {
+          if (action.payload.append) {
+            const existing = chat.messages.find(
+              (m) => m.id === action.payload.id
+            );
+            if (existing) {
+              const prevChar = existing.text.slice(-1);
+              const prefix =
+                prevChar &&
+                prevChar !== " " &&
+                !action.payload.text.startsWith(" ")
+                  ? " "
+                  : "";
+              existing.text += prefix + action.payload.text;
+            } else {
+              chat.messages.push(action.payload);
+            }
+          } else {
+            chat.messages.push(action.payload);
+          }
+        }
       });
     },
     createChat: (state, action: PayloadAction<string>) => {

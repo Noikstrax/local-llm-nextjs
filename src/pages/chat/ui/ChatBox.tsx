@@ -9,6 +9,7 @@ import {
   Chat,
   createChat,
   sendMessage,
+  streamMessage,
 } from "../../../../app/store/chats/chatsSlice";
 import { useParams, useRouter } from "next/navigation";
 
@@ -75,7 +76,7 @@ export const ChatBox = ({ className }: Props) => {
 
     const model = selectedModel?.name;
     if (model) {
-      dispatch(sendMessage({ newMessage, model, chatId }));
+      dispatch(streamMessage({ newMessage, model, chatId }));
     } else {
       console.error("No selected model");
     }
