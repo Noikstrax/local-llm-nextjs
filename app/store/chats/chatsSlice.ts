@@ -206,7 +206,7 @@ export const streamMessage = createAsyncThunk<
       if (done) break;
 
       const chunk = decoder.decode(value);
-
+      // добавляем как есть, без обработки
       dispatch(
         addMessage({
           id: msgId,
@@ -236,14 +236,8 @@ export const chatsSlice = createSlice({
               (m) => m.id === action.payload.id
             );
             if (existing) {
-              const prevChar = existing.text.slice(-1);
-              const prefix =
-                prevChar &&
-                prevChar !== " " &&
-                !action.payload.text.startsWith(" ")
-                  ? " "
-                  : "";
-              existing.text += prefix + action.payload.text;
+              // просто добавляем текст, ничего не трогаем
+              existing.text += action.payload.text;
             } else {
               chat.messages.push(action.payload);
             }
