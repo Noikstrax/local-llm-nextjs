@@ -146,32 +146,55 @@ export const sendMessage = createAsyncThunk<
 );
 
 export const resendMessage = createAsyncThunk<
-  { chatId: string; answer: string; messageId: string },
-  {
-    messageId: string;
-    chatId: string;
-  }
->(
-  "chats/resendMessage",
-  async (messageData: { messageId: string; chatId: string }) => {
-    const { messageId, chatId } = messageData;
-    const res = await fetch("/api/chat/messages/resendMessage", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ messageId, chatId }),
-    });
+  void,
+  { messageId: string; chatId: string }
+>("chats/resendMessage", async ({ messageId, chatId }, { dispatch }) => {
+  const msgId = crypto.randomUUID();
 
-    const data = await res.json();
-
-    return {
+  dispatch(
+    addMessage({
+      id: msgId,
+      text: "",
+      owner: "ai",
       chatId,
-      answer: data.response ?? "Error",
-      messageId,
-    };
+      loading: "succeeded",
+    })
+  );
+
+  const res = await fetch("/api/chat/messages/resendMessage", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ messageId, chatId }),
+  });
+
+  if (!res.body) throw new Error("No response body");
+
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+
+  let fullAnswer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    const chunk = decoder.decode(value);
+    fullAnswer += chunk;
+
+    dispatch(
+      addMessage({
+        id: msgId,
+        text: chunk,
+        owner: "ai",
+        chatId,
+        append: true,
+        loading: "succeeded",
+      })
+    );
   }
-);
+
+  dispatch(setMessageStatus({ chatId, messageId, loading: "succeeded" }));
+});
 
 export const streamMessage = createAsyncThunk<
   void,
@@ -206,7 +229,6 @@ export const streamMessage = createAsyncThunk<
       if (done) break;
 
       const chunk = decoder.decode(value);
-      // добавляем как есть, без обработки
       dispatch(
         addMessage({
           id: msgId,
@@ -225,6 +247,27 @@ export const chatsSlice = createSlice({
   name: "chats",
   initialState,
   reducers: {
+    setMessageStatus: (
+      state,
+      action: PayloadAction<{
+        chatId: string;
+        messageId: string;
+        loading: "pending" | "succeeded" | "failed";
+      }>
+    ) => {
+      const chat = state.chats.find(
+        (chat) => chat.chatId === action.payload.chatId
+      );
+
+      if (chat) {
+        const msg = chat.messages.find(
+          (message) => message.id === action.payload.messageId
+        );
+        if (msg) {
+          msg.loading = action.payload.loading;
+        }
+      }
+    },
     addMessage: (
       state,
       action: PayloadAction<MessagePayload & { append?: boolean }>
@@ -236,7 +279,6 @@ export const chatsSlice = createSlice({
               (m) => m.id === action.payload.id
             );
             if (existing) {
-              // просто добавляем текст, ничего не трогаем
               existing.text += action.payload.text;
             } else {
               chat.messages.push(action.payload);
@@ -309,52 +351,52 @@ export const chatsSlice = createSlice({
       .addCase(asyncCreateChat.fulfilled, (state, action) => {
         state.isLoading = "succeeded";
         state.chats.push(action.payload);
-      })
-      .addCase(resendMessage.pending, (state, action) => {
-        const { chatId } = action.meta.arg;
-        const chat = state.chats.find((chat) => chat.chatId === chatId);
-        if (chat) {
-          const nextId = crypto.randomUUID();
-          chat.messages.push({
-            id: nextId,
-            text: "loading",
-            owner: "ai",
-            loading: "pending",
-          });
-        }
-      })
-      .addCase(resendMessage.fulfilled, (state, action) => {
-        const { chatId, answer, messageId } = action.payload;
-        const chat = state.chats.find((chat) => chat.chatId === chatId);
-        if (chat) {
-          const aiMessage = chat.messages.find(
-            (message) => message.owner === "ai" && message.loading === "pending"
-          );
-          const userMessage = chat.messages.find(
-            (message) => message.id === messageId
-          );
-          if (aiMessage && userMessage) {
-            aiMessage.text = answer;
-            aiMessage.loading = "succeeded";
-            userMessage.loading = "succeeded";
-          }
-        }
-      })
-      .addCase(resendMessage.rejected, (state, action) => {
-        const { chatId } = action.meta.arg;
-        const chat = state.chats.find((chat) => chat.chatId === chatId);
-        if (chat) {
-          const aiMessage = chat.messages.find(
-            (message) => message.owner === "ai" && message.loading === "pending"
-          );
-          if (aiMessage) {
-            aiMessage.text = "Ошибка при получении ответа";
-            aiMessage.loading = "failed";
-          }
-        }
       });
+    // .addCase(resendMessage.pending, (state, action) => {
+    //   const { chatId } = action.meta.arg;
+    //   const chat = state.chats.find((chat) => chat.chatId === chatId);
+    //   if (chat) {
+    //     const nextId = crypto.randomUUID();
+    //     chat.messages.push({
+    //       id: nextId,
+    //       text: "loading",
+    //       owner: "ai",
+    //       loading: "pending",
+    //     });
+    //   }
+    // })
+    // .addCase(resendMessage.fulfilled, (state, action) => {
+    //   const { chatId, answer, messageId } = action.payload;
+    //   const chat = state.chats.find((chat) => chat.chatId === chatId);
+    //   if (chat) {
+    //     const aiMessage = chat.messages.find(
+    //       (message) => message.owner === "ai" && message.loading === "pending"
+    //     );
+    //     const userMessage = chat.messages.find(
+    //       (message) => message.id === messageId
+    //     );
+    //     if (aiMessage && userMessage) {
+    //       aiMessage.text = answer;
+    //       aiMessage.loading = "succeeded";
+    //       userMessage.loading = "succeeded";
+    //     }
+    //   }
+    // })
+    // .addCase(resendMessage.rejected, (state, action) => {
+    //   const { chatId } = action.meta.arg;
+    //   const chat = state.chats.find((chat) => chat.chatId === chatId);
+    //   if (chat) {
+    //     const aiMessage = chat.messages.find(
+    //       (message) => message.owner === "ai" && message.loading === "pending"
+    //     );
+    //     if (aiMessage) {
+    //       aiMessage.text = "Ошибка при получении ответа";
+    //       aiMessage.loading = "failed";
+    //     }
+    //   }
+    // });
   },
 });
 
-export const { addMessage, createChat } = chatsSlice.actions;
+export const { addMessage, createChat, setMessageStatus } = chatsSlice.actions;
 export default chatsSlice.reducer;

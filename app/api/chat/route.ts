@@ -2,6 +2,7 @@ import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
 import ollama from "ollama";
 
+//TODO DRY
 function cleanResponse(text: string): string {
   return text.replace(/<think>[\s\S]*?<\/think>/g, "");
 }
@@ -26,7 +27,6 @@ Please respond in proper Markdown format:
 User prompt: ${prompt}
 `;
 
-    // Сохраняем запрос пользователя
     const postResult = await prisma.messages.create({
       data: {
         text: prompt,
@@ -43,7 +43,6 @@ User prompt: ${prompt}
     const stream = new ReadableStream({
       async start(controller) {
         try {
-          // Используем потоковый генератор из ollama-js
           const response = await ollama.chat({
             model,
             messages: [{ role: "user", content: promptWithMarkdown }],
@@ -58,7 +57,6 @@ User prompt: ${prompt}
             }
           }
 
-          // Сохраняем полный AI-ответ в БД после завершения потока
           await prisma.messages.create({
             data: {
               text: fullResponse,

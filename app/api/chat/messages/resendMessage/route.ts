@@ -1,8 +1,10 @@
 import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
+import ollama from "ollama";
 
+//TODO DRY
 function cleanResponse(text: string): string {
-  return text.replace(/<think>[\s\S]*?<\/think>/g, "").trim();
+  return text.replace(/<think>[\s\S]*?<\/think>/g, "");
 }
 
 export async function POST(req: NextRequest) {
@@ -38,66 +40,69 @@ export async function POST(req: NextRequest) {
 
     const { model, text: prompt, chatId } = messageData;
 
-    const ollamaPayload = {
-      model,
-      prompt,
-      stream: false,
-    };
+    const encoder = new TextEncoder();
+    let fullResponse = "";
 
-    const ollamaRes = await fetch(`${LLM_HOST}/api/generate`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(ollamaPayload),
-    });
+    const stream = new ReadableStream({
+      async start(controller) {
+        try {
+          const response = await ollama.chat({
+            model,
+            messages: [{ role: "user", content: prompt }],
+            stream: true,
+          });
 
-    if (!ollamaRes.ok) {
-      const error = await ollamaRes.text();
-      await prisma.messages.update({
-        data: {
-          loading: "failed",
-        },
-        where: {
-          id: messageId,
-        },
-      });
-      throw new Error(`[OLLAMA_FETCH_GENERATE] Server Error: ${error}`);
-    }
+          for await (const part of response) {
+            if (part.message?.content) {
+              const clean = cleanResponse(part.message.content);
+              fullResponse += clean;
+              controller.enqueue(encoder.encode(clean));
+            }
+          }
 
-    const result = await ollamaRes.json();
+          controller.close();
 
-    const prismaResult = await prisma.messages.create({
-      data: {
-        text: cleanResponse(result.response),
-        chatId,
-        owner: "ai",
-        loading: "succeeded",
-        model,
+          const prismaResult = await prisma.messages.create({
+            data: {
+              text: fullResponse,
+              chatId,
+              owner: "ai",
+              loading: "succeeded",
+              model,
+            },
+          });
+
+          if (!prismaResult) {
+            throw new Error(`[DB_POST_ERROR] for answer in Chat: ${chatId}`);
+          } else {
+            await prisma.messages.update({
+              where: {
+                id: messageId,
+              },
+              data: {
+                loading: "succeeded",
+              },
+            });
+          }
+        } catch (e) {
+          await prisma.messages.update({
+            data: {
+              loading: "failed",
+            },
+            where: {
+              id: messageId,
+            },
+          });
+          console.error("AI resend message stream error: ", e);
+        }
       },
     });
 
-    if (!prismaResult) {
-      throw new Error(`[DB_POST_ERROR] for answer in Chat: ${chatId}`);
-    } else {
-      await prisma.messages.update({
-        where: {
-          id: messageId,
-        },
-        data: {
-          loading: "succeeded",
-        },
-      });
-    }
-
-    return NextResponse.json(result);
+    return new NextResponse(stream, {
+      headers: { "Content-Type": "text/plain; charset=utf-8" },
+    });
   } catch (e) {
-    console.error(
-      NextResponse.json(
-        {
-          message: e,
-        },
-        { status: 500 }
-      )
-    );
+    console.error("Router /api/chat/resendMessage error: ", e);
     return NextResponse.json(
       {
         message: e,
