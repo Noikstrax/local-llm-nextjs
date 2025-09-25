@@ -33,7 +33,7 @@ export const ChatsList = () => {
     );
   } else if (chats.isLoading === "succeeded") {
     return (
-      <div className="max-h-[60vh] overflow-auto">
+      <div className="max-h-[60vh]">
         <ul>
           {chats.chats.map((chat) => (
             <li
