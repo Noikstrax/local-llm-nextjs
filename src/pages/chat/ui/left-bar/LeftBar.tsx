@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { ChatsList } from "./ChatsList";
+import { LoginMenu } from "@/shared/ui";
 
 interface Props {
   className?: string;
@@ -47,7 +48,9 @@ export const LeftBar = ({ className }: Props) => {
       <div className="w-full">
         <hr className="border-t-2 border-gray-300 my-2" />
       </div>
-      <div className="py-2 pl-2 px-1">Login</div>
+      <div className="py-2 pl-2 px-1">
+        <LoginMenu />
+      </div>
     </div>
   );
 };
