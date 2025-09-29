@@ -49,7 +49,7 @@ export const LeftBar = ({ className }: Props) => {
         <hr className="border-t-2 border-gray-300 my-2" />
       </div>
       <div className="py-2 pl-2 px-1">
-        <LoginMenu />
+        <Link href={"/login"}>Login</Link>
       </div>
     </div>
   );

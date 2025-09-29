@@ -1,43 +1,26 @@
-"use client";
-
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../dialog";
-import { Label } from "../label";
-import { Input } from "../input";
-import { Button } from "../button";
-import { FormProvider, useForm } from "react-hook-form";
-
-import * as z from "zod";
-import { loginSchema, TLoginValues } from "./schema";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { RegisterMenu } from "./register-menu";
+import { Button } from "../button";
+import { Input } from "../input";
+import { Label } from "../label";
+import { FormProvider, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { registerSchema, TRegisterValues } from "./schema";
 import Link from "next/link";
 
-const LoginData = z.object({
-  userEmail: z.email(),
-  password: z.string(),
-});
-
-export const LoginMenu = () => {
+export const RegisterMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const form = useForm<TLoginValues>({
-    resolver: zodResolver(loginSchema),
+  const form = useForm<TRegisterValues>({
+    resolver: zodResolver(registerSchema),
     defaultValues: {
       email: "",
+      userName: "",
       password: "",
+      confirmPassword: "",
     },
   });
 
-  const onSubmit = (data: TLoginValues) => {
-    console.log("onSubmit");
+  const onSubmit = (data: TRegisterValues) => {
+    console.log("onRegister");
     try {
       const resp = { ok: true };
       if (!resp?.ok) {
@@ -61,9 +44,9 @@ export const LoginMenu = () => {
                 Account registration
               </h2>
               <p className="text-center text-lg">
-                Not{" "}
+                Already{" "}
                 <Link
-                  href="/register"
+                  href="/login"
                   className="text-blue-400 hover:text-blue-300"
                 >
                   registered
@@ -83,6 +66,18 @@ export const LoginMenu = () => {
                   required
                 ></Input>
               </div>
+              <div className="grid gap-3">
+                <Label htmlFor="userName" className="text-gray-400">
+                  User name
+                </Label>
+                <Input
+                  {...form.register("userName")}
+                  id="userName"
+                  name="userName"
+                  type="text"
+                  required
+                ></Input>
+              </div>
 
               <div className="grid gap-3">
                 <Label htmlFor="password" className="text-gray-400">
@@ -96,12 +91,25 @@ export const LoginMenu = () => {
                   required
                 ></Input>
               </div>
+
+              <div className="grid gap-3">
+                <Label htmlFor="confirmPassword" className="text-gray-400">
+                  Confirm Password
+                </Label>
+                <Input
+                  {...form.register("confirmPassword")}
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type="password"
+                  required
+                ></Input>
+              </div>
             </div>
             <Button
               type="submit"
               className="w-full hover:cursor-pointer text-white text-lg mt-4 bg-blue-600 hover:bg-blue-700"
             >
-              Login
+              Register
             </Button>
           </div>
         </form>
