@@ -1,14 +1,5 @@
 "use client";
 
-import {
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "../dialog";
 import { Label } from "../label";
 import { Input } from "../input";
 import { Button } from "../button";
@@ -18,7 +9,6 @@ import * as z from "zod";
 import { loginSchema, TLoginValues } from "./schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { RegisterMenu } from "./register-menu";
 import Link from "next/link";
 
 const LoginData = z.object({

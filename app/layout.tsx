@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LeftBar } from "../src/pages/chat/ui/left-bar/LeftBar";
 import { StoreProvider } from "./StoreProvider";
+import { Providers } from "@/shared/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -29,9 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider>
+        <Providers>
           <div className="w-full max-h-screen">{children}</div>
-        </StoreProvider>
+        </Providers>
       </body>
     </html>
   );
