@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ChatsList } from "./ChatsList";
 import { LoginMenu } from "@/shared/ui";
+import { UserAuth } from "@/shared/components/user-auth";
 
 interface Props {
   className?: string;
@@ -49,7 +50,7 @@ export const LeftBar = ({ className }: Props) => {
         <hr className="border-t-2 border-gray-300 my-2" />
       </div>
       <div className="py-2 pl-2 px-1">
-        <Link href={"/login"}>Login</Link>
+        <UserAuth />
       </div>
     </div>
   );

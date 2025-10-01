@@ -10,6 +10,8 @@ import { loginSchema, TLoginValues } from "./schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import Link from "next/link";
+import { signIn } from "next-auth/react";
+import Image from "next/image";
 
 const LoginData = z.object({
   userEmail: z.email(),
@@ -86,6 +88,50 @@ export const LoginMenu = () => {
                   required
                 ></Input>
               </div>
+            </div>
+            <div className="flex gap-2 mt-4">
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  signIn("github", {
+                    callbackUrl: "/",
+                    redirect: true,
+                  })
+                }
+                type="button"
+                className="gap-2 h-12 p-2 flex-1 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
+              >
+                <div className="relative w-6 h-6">
+                  <Image
+                    className=""
+                    src="https://github.githubassets.com/favicons/favicon.svg"
+                    fill
+                    alt="github-icon"
+                  />
+                </div>
+                GitHub
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() =>
+                  signIn("google", {
+                    callbackUrl: "/",
+                    redirect: true,
+                  })
+                }
+                type="button"
+                className="gap-2 h-12 p-2 flex-1 bg-gray-700 hover:bg-gray-600 hover:cursor-pointer"
+              >
+                <div className="relative w-6 h-6">
+                  <Image
+                    className=""
+                    src="https://fonts.gstatic.com/s/i/productlogos/googleg/v6/24px.svg"
+                    fill
+                    alt="google-icon"
+                  />
+                </div>
+                Google
+              </Button>
             </div>
             <Button
               type="submit"
