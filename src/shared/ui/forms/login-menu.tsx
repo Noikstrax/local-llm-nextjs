@@ -4,22 +4,15 @@ import { Label } from "../label";
 import { Input } from "../input";
 import { Button } from "../button";
 import { FormProvider, useForm } from "react-hook-form";
-
-import * as z from "zod";
 import { loginSchema, TLoginValues } from "./schema";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useState } from "react";
 import Link from "next/link";
 import { signIn } from "next-auth/react";
 import Image from "next/image";
-
-const LoginData = z.object({
-  userEmail: z.email(),
-  password: z.string(),
-});
+import { useRouter } from "next/navigation";
 
 export const LoginMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useRouter();
   const form = useForm<TLoginValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
@@ -28,16 +21,23 @@ export const LoginMenu = () => {
     },
   });
 
-  const onSubmit = (data: TLoginValues) => {
+  const onSubmit = async (data: TLoginValues) => {
     console.log("onSubmit");
     try {
-      const resp = { ok: true };
+      const resp = await signIn("credentials", {
+        ...data,
+        redirect: false,
+      });
+
       if (!resp?.ok) {
-        throw new Error("acocunt is not find");
+        throw Error();
       }
-      setIsOpen(false);
+
+      console.log("Вы успешно вошли в аккаунт");
+      navigate.push("/");
     } catch (e) {
       console.error("Error [LOGIN]: ", e);
+      console.log("Не удалось войти в аккаунт");
     }
   };
   return (
@@ -134,6 +134,7 @@ export const LoginMenu = () => {
               </Button>
             </div>
             <Button
+              disabled={form.formState.isSubmitting}
               type="submit"
               className="w-full hover:cursor-pointer text-white text-lg mt-4 bg-blue-600 hover:bg-blue-700"
             >

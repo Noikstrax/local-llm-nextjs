@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Button } from "../button";
 import { Input } from "../input";
 import { Label } from "../label";
@@ -6,9 +5,11 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, TRegisterValues } from "./schema";
 import Link from "next/link";
+import { registerUser } from "../../../../app/api/action";
+import { useRouter } from "next/navigation";
 
 export const RegisterMenu = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const navigate = useRouter();
   const form = useForm<TRegisterValues>({
     resolver: zodResolver(registerSchema),
     defaultValues: {
@@ -19,14 +20,16 @@ export const RegisterMenu = () => {
     },
   });
 
-  const onSubmit = (data: TRegisterValues) => {
-    console.log("onRegister");
+  const onSubmit = async (data: TRegisterValues) => {
     try {
-      const resp = { ok: true };
-      if (!resp?.ok) {
-        throw new Error("acocunt is not find");
-      }
-      setIsOpen(false);
+      await registerUser({
+        email: data.email,
+        name: data.userName,
+        password: data.password,
+      });
+
+      console.log("Successfull registration");
+      navigate.push("/login");
     } catch (e) {
       console.error("Error [LOGIN]: ", e);
     }
