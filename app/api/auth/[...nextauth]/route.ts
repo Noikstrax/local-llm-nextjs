@@ -4,8 +4,9 @@ import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { compare, hashSync } from "bcrypt";
+import { AuthOptions } from "next-auth";
 
-export const authOptions = {
+export const authOptions: AuthOptions = {
   providers: [
     GithubProvider({
       clientId: process.env.GITHUB_ID || "",
@@ -58,7 +59,7 @@ export const authOptions = {
         }
 
         return {
-          id: String(findUser.id),
+          id: findUser.id,
           email: findUser.email,
           name: findUser.name,
         };
@@ -127,6 +128,7 @@ export const authOptions = {
       if (!token.email) {
         return token;
       }
+
       const findUser = await prisma.users.findFirst({
         where: {
           email: token.email,
