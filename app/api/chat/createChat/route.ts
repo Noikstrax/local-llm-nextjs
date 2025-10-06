@@ -1,7 +1,6 @@
+import { getUserSessionId } from "@/shared/lib/auth/get-user-session-id";
 import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
-
-const TEMP_USER_ID = 1;
 
 export async function POST(req: NextRequest) {
   try {
@@ -30,11 +29,23 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const userId = await getUserSessionId();
+
+    if (!userId) {
+      return NextResponse.json(
+        {
+          message: "[CREATE_CHAT]: userId is missing",
+          error: true,
+        },
+        { status: 400 }
+      );
+    }
+
     const result = await prisma.chats.create({
       data: {
         chatId,
         title: `Chat: ${chatId}`,
-        userId: TEMP_USER_ID,
+        userId: Number(userId),
       },
     });
 
