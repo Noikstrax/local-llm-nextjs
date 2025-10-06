@@ -19,14 +19,6 @@ export async function POST(req: NextRequest) {
       });
     }
 
-    const promptWithMarkdown = `
-Please respond in proper Markdown format:
-- No extra spaces inside words or around apostrophes.
-- Preserve correct punctuation and spacing.
-- Do not alter Markdown formatting.
-User prompt: ${prompt}
-`;
-
     const postResult = await prisma.messages.create({
       data: {
         text: prompt,
@@ -45,7 +37,7 @@ User prompt: ${prompt}
         try {
           const response = await ollama.chat({
             model,
-            messages: [{ role: "user", content: promptWithMarkdown }],
+            messages: [{ role: "user", content: prompt }],
             stream: true,
           });
 
