@@ -3,6 +3,8 @@
 import { useEffect, useRef } from "react";
 import { useAppSelector } from "../../../../../app/store/hooks";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
+import Link from "next/link";
 
 interface Props {
   handleSend: () => void;
@@ -11,6 +13,7 @@ interface Props {
 }
 
 export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
+  const { data: session } = useSession();
   const { loading } = useAppSelector((state) => state.models);
   const isButtonDisabled = loading === "failed" ? true : false;
   const adjustHeight = (ta: HTMLTextAreaElement) => {
@@ -72,17 +75,33 @@ export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
           />
         </div>
         <div className="flex justify-end">
-          <button
-            className={cn(
-              isButtonDisabled
-                ? "bg-gray-800 text-white px-4 py-1 rounded cursor-pointer row-end-1 opacity-60 hover:bg-red-500"
-                : "bg-blue-500 text-white px-4 py-1 rounded cursor-pointer row-end-1 hover:bg-green-500"
-            )}
-            type="submit"
-            disabled={isButtonDisabled}
-          >
-            Send
-          </button>
+          {!session ? (
+            <Link href="/login">
+              <button
+                className={cn(
+                  isButtonDisabled
+                    ? "bg-gray-800 text-white px-4 py-1 rounded cursor-pointer row-end-1 opacity-60 hover:bg-red-500"
+                    : "bg-blue-500 text-white px-4 py-1 rounded cursor-pointer row-end-1 hover:bg-green-500"
+                )}
+                type="button"
+                disabled={isButtonDisabled}
+              >
+                Send
+              </button>
+            </Link>
+          ) : (
+            <button
+              className={cn(
+                isButtonDisabled
+                  ? "bg-gray-800 text-white px-4 py-1 rounded cursor-pointer row-end-1 opacity-60 hover:bg-red-500"
+                  : "bg-blue-500 text-white px-4 py-1 rounded cursor-pointer row-end-1 hover:bg-green-500"
+              )}
+              type="submit"
+              disabled={isButtonDisabled}
+            >
+              Send
+            </button>
+          )}
         </div>
       </div>
     </form>

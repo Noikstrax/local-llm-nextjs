@@ -15,6 +15,9 @@ model Users {
     email String
     password String
 
+    provider String?
+    providerId String?
+
     chats Chats[]
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt

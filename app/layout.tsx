@@ -2,9 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { LeftBar } from "../src/pages/chat/ui/left-bar/LeftBar";
-import { Provider } from "react-redux";
-import { store } from "./store/store";
 import { StoreProvider } from "./StoreProvider";
+import { Providers } from "@/shared/components/providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -31,14 +30,9 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <StoreProvider>
-          <div className="flex justify-center h-full">
-            <div className="w-1/6 bg-zinc-900 hidden sm:hidden md:block">
-              <LeftBar className="text-white w-full h-screen " />
-            </div>
-            <div className="md:w-5/6 w-full max-h-screen">{children}</div>
-          </div>
-        </StoreProvider>
+        <Providers>
+          <div className="w-full max-h-screen">{children}</div>
+        </Providers>
       </body>
     </html>
   );
