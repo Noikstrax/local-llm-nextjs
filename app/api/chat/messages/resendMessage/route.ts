@@ -1,3 +1,4 @@
+import { getUserSessionId } from "@/shared/lib/auth/get-user-session-id";
 import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
 import ollama from "ollama";
@@ -9,6 +10,7 @@ function cleanResponse(text: string): string {
 
 export async function POST(req: NextRequest) {
   try {
+    const userId = await getUserSessionId();
     const LLM_HOST = process.env.LLM_HOST;
     if (!LLM_HOST) {
       return NextResponse.json({
@@ -39,6 +41,20 @@ export async function POST(req: NextRequest) {
     }
 
     const { model, text: prompt, chatId } = messageData;
+
+    const chat = await prisma.chats.findFirst({
+      where: {
+        chatId,
+        user: { id: Number(userId) },
+      },
+    });
+
+    if (!chat) {
+      return NextResponse.json({
+        error: true,
+        message: "You are not chat owner",
+      });
+    }
 
     const encoder = new TextEncoder();
     let fullResponse = "";
