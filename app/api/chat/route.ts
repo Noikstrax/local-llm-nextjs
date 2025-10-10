@@ -1,3 +1,4 @@
+import { getUserSessionId } from "@/shared/lib/auth/get-user-session-id";
 import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { NextRequest, NextResponse } from "next/server";
 import ollama from "ollama";
@@ -11,6 +12,22 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
     const { prompt, model, chatId } = body;
+
+    const userId = await getUserSessionId();
+
+    const chat = await prisma.chats.findFirst({
+      where: {
+        chatId,
+        user: { id: Number(userId) },
+      },
+    });
+
+    if (!chat) {
+      return NextResponse.json({
+        error: true,
+        message: "You are not chat owner",
+      });
+    }
 
     if (!prompt) {
       return NextResponse.json({
