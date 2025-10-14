@@ -15,8 +15,11 @@ import { Label } from "../label";
 import { TemperatureSlider } from "./temperature-slider";
 import { temperatureSchema, TTemperatureValue } from "../forms/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useState } from "react";
 
 export function ProfileSettings() {
+  const [open, setOpen] = useState(false);
+
   const form = useForm<TTemperatureValue>({
     resolver: zodResolver(temperatureSchema),
     defaultValues: {
@@ -24,12 +27,28 @@ export function ProfileSettings() {
     },
   });
 
-  const onSubmit = (data: TTemperatureValue) => {
+  const onSubmit = async (data: TTemperatureValue) => {
     console.log(data.temperature);
+
+    try {
+      const res = await fetch(`/api/profile/settings/temperature/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ temperature: data.temperature }),
+      });
+
+      if (!res.ok) {
+        throw new Error("[UPDATE_TEMPERATURE] fetch error");
+      }
+
+      setOpen(false);
+    } catch (e) {
+      console.error("Update temperature error: ", e);
+    }
   };
 
   return (
-    <Dialog>
+    <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline">Settings</Button>
       </DialogTrigger>

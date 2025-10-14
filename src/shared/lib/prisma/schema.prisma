@@ -17,6 +17,7 @@ model Users {
 
     provider String?
     providerId String?
+    temperature Float @default(0.5)
 
     chats Chats[]
     createdAt DateTime @default(now())
