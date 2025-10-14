@@ -19,5 +19,10 @@ export const registerSchema = loginSchema
     path: ["confirmPassword"],
   });
 
+export const temperatureSchema = z.object({
+  temperature: z.number().min(0).max(1),
+});
+
 export type TLoginValues = z.infer<typeof loginSchema>;
 export type TRegisterValues = z.infer<typeof registerSchema>;
+export type TTemperatureValue = z.infer<typeof temperatureSchema>;
