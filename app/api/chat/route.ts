@@ -46,6 +46,12 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    const user = await prisma.users.findFirst({
+      where: {
+        id: Number(userId),
+      },
+    });
+
     const encoder = new TextEncoder();
     let fullResponse = "";
 
@@ -56,6 +62,9 @@ export async function POST(req: NextRequest) {
             model,
             messages: [{ role: "user", content: prompt }],
             stream: true,
+            options: {
+              temperature: user?.temperature || 0.5,
+            },
           });
 
           for await (const part of response) {
