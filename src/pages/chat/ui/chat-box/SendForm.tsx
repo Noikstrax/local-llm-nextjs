@@ -1,18 +1,17 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useAppSelector } from "../../../../../app/store/hooks";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 
 interface Props {
-  handleSend: () => void;
-  newMessage: string;
-  onChange: (newMessage: string) => void;
+  handleSend: (newMessage: string) => void;
 }
 
-export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
+export const SendForm = ({ handleSend }: Props) => {
+  const [newMessage, setNewMessage] = useState<string>("");
   const { data: session } = useSession();
   const { loading } = useAppSelector((state) => state.models);
   const isButtonDisabled = loading === "failed" ? true : false;
@@ -37,7 +36,7 @@ export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    onChange(e.target.value);
+    setNewMessage(e.target.value);
     adjustHeight(e.target);
   };
 
@@ -58,7 +57,8 @@ export const SendForm = ({ handleSend, newMessage, onChange }: Props) => {
     <form
       onSubmit={(e) => {
         e.preventDefault();
-        handleSend();
+        handleSend(newMessage);
+        setNewMessage("");
       }}
       className="flex space-between w-full mt-10"
     >
