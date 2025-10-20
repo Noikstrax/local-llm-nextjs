@@ -1,4 +1,4 @@
-import { Message } from "../../../src/pages/chat/ui/chat-box/MessageList";
+import { Message } from "@/pages/chat/ui/chat-box/MessageList";
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import type { PayloadAction } from "@reduxjs/toolkit";
 
