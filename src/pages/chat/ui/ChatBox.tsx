@@ -9,6 +9,7 @@ import {
   streamMessage,
 } from "../../../../app/store/chats/chatsSlice";
 import { useParams, useRouter } from "next/navigation";
+import { selectMessagesByChatId } from "../../../../app/store/chatsSelectors";
 
 interface Props {
   className?: string;
@@ -29,12 +30,7 @@ export const ChatBox = ({ className }: Props) => {
   const selectedModel = models.models.find((model) => model.isSelected);
 
   const messages: Message[] = isCreatedChat
-    ? useAppSelector((state) => {
-        const chat = state.chats.chats.find(
-          (chat) => chat.chatId === params?.id
-        );
-        return chat ? chat.messages : [];
-      })
+    ? useAppSelector(selectMessagesByChatId(params?.id ?? ""))
     : [];
 
   const handleSend = async (message: string) => {

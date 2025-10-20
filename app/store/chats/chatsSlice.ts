@@ -352,49 +352,6 @@ export const chatsSlice = createSlice({
         state.isLoading = "succeeded";
         state.chats.push(action.payload);
       });
-    // .addCase(resendMessage.pending, (state, action) => {
-    //   const { chatId } = action.meta.arg;
-    //   const chat = state.chats.find((chat) => chat.chatId === chatId);
-    //   if (chat) {
-    //     const nextId = crypto.randomUUID();
-    //     chat.messages.push({
-    //       id: nextId,
-    //       text: "loading",
-    //       owner: "ai",
-    //       loading: "pending",
-    //     });
-    //   }
-    // })
-    // .addCase(resendMessage.fulfilled, (state, action) => {
-    //   const { chatId, answer, messageId } = action.payload;
-    //   const chat = state.chats.find((chat) => chat.chatId === chatId);
-    //   if (chat) {
-    //     const aiMessage = chat.messages.find(
-    //       (message) => message.owner === "ai" && message.loading === "pending"
-    //     );
-    //     const userMessage = chat.messages.find(
-    //       (message) => message.id === messageId
-    //     );
-    //     if (aiMessage && userMessage) {
-    //       aiMessage.text = answer;
-    //       aiMessage.loading = "succeeded";
-    //       userMessage.loading = "succeeded";
-    //     }
-    //   }
-    // })
-    // .addCase(resendMessage.rejected, (state, action) => {
-    //   const { chatId } = action.meta.arg;
-    //   const chat = state.chats.find((chat) => chat.chatId === chatId);
-    //   if (chat) {
-    //     const aiMessage = chat.messages.find(
-    //       (message) => message.owner === "ai" && message.loading === "pending"
-    //     );
-    //     if (aiMessage) {
-    //       aiMessage.text = "Ошибка при получении ответа";
-    //       aiMessage.loading = "failed";
-    //     }
-    //   }
-    // });
   },
 });
 
