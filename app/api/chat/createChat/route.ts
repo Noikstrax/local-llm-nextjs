@@ -5,7 +5,18 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { chatId } = body;
+
+    if (!body) {
+      return NextResponse.json(
+        {
+          message: "[CREATE_CHAT]: request body is missing",
+          error: true,
+        },
+        { status: 400 }
+      );
+    }
+
+    const { chatId, title } = body;
 
     if (!chatId) {
       return NextResponse.json(
@@ -19,13 +30,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!body) {
+    if (!title) {
       return NextResponse.json(
         {
-          message: "[CREATE_CHAT]: request body is missing",
+          message: "[CREATE_CHAT]: title is missing",
           error: true,
         },
-        { status: 400 }
+        {
+          status: 400,
+        }
       );
     }
 
@@ -44,7 +57,7 @@ export async function POST(req: NextRequest) {
     const result = await prisma.chats.create({
       data: {
         chatId,
-        title: `Chat: ${chatId}`,
+        title,
         userId: Number(userId),
       },
     });

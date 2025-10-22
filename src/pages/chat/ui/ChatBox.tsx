@@ -46,7 +46,9 @@ export const ChatBox = ({ className }: Props) => {
 
     let chatCreated = true;
     if (!isCreatedChat) {
-      const result = await dispatch(asyncCreateChat(chatId));
+      const result = await dispatch(
+        asyncCreateChat({ chatId, title: newMessage })
+      );
       chatCreated = result.meta.requestStatus === "fulfilled";
       if (!chatCreated) {
         console.error("Failed to create chat");

@@ -102,26 +102,26 @@ export type MessagePayload = Message & {
   chatId: string;
 };
 
-export const asyncCreateChat = createAsyncThunk<Chat, string>(
-  "chats/asyncCreateChat",
-  async (chatId) => {
-    const req = await fetch("/api/chat/createChat", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ chatId }),
-    });
+export const asyncCreateChat = createAsyncThunk<
+  Chat,
+  { chatId: string; title: string }
+>("chats/asyncCreateChat", async ({ chatId, title }) => {
+  const req = await fetch("/api/chat/createChat", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ chatId, title }),
+  });
 
-    const res = await req.json();
+  const res = await req.json();
 
-    return {
-      chatId: res.chatId,
-      title: res.title,
-      messages: [],
-    };
-  }
-);
+  return {
+    chatId: res.chatId,
+    title: res.title,
+    messages: [],
+  };
+});
 
 export const sendMessage = createAsyncThunk<
   { chatId: string; answer: string },
