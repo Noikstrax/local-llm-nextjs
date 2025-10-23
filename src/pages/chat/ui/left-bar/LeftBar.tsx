@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ChatsList } from "./ChatsList";
 import { LoginMenu } from "@/shared/ui";
 import { UserAuth } from "@/shared/components/user-auth";
+import { Logo } from "@/shared/ui/icons/logo";
 
 interface Props {
   className?: string;
@@ -14,7 +15,11 @@ export const LeftBar = ({ className }: Props) => {
     <div className={className + "flex flex-col h-screen"}>
       <div className="sticky top-0 block w-full">
         <div className="flex justify-between py-3 pl-2 px-2">
-          <div>Logo</div>
+          <div>
+            <Link href="\">
+              <Logo text="LLmw" />
+            </Link>
+          </div>
           <div>
             <button
               onClick={(e) => {

@@ -16,6 +16,7 @@ import { TemperatureSlider } from "./temperature-slider";
 import { temperatureSchema, TTemperatureValue } from "../forms/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
+import { Settings } from "lucide-react";
 
 export function ProfileSettings() {
   const [open, setOpen] = useState(false);
@@ -50,7 +51,9 @@ export function ProfileSettings() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">Settings</Button>
+        <Button variant="outline">
+          <Settings />
+        </Button>
       </DialogTrigger>
       <FormProvider {...form}>
         <DialogContent className="sm:max-w-[425px]">
