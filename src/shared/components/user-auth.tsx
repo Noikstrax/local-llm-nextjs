@@ -7,7 +7,7 @@ import { Logo } from "../ui/icons/logo";
 
 export const UserAuth = () => {
   const { data: session } = useSession();
-  const firstLetterFromName = session?.user.name.split("")[0];
+  const firstLetterFromName = session?.user.name.split("")[0].toUpperCase();
   return (
     <div className="flex justify-between max-w-full items-center">
       {!session ? (
@@ -17,7 +17,7 @@ export const UserAuth = () => {
       ) : (
         <>
           <div>
-            <Logo text={firstLetterFromName ?? ""} />
+            <Logo text={firstLetterFromName ?? ""} className="text-xl" />
           </div>
 
           <div className="flex items-center gap-4 ml-auto">
