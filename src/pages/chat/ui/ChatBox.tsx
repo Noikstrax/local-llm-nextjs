@@ -106,7 +106,7 @@ export const ChatBox = ({ className }: Props) => {
     };
 
     fetchMessages();
-  }, [chat, params?.id, navigate]);
+  }, [params?.id, navigate]);
 
   return (
     <div className={className}>
