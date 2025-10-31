@@ -1,5 +1,4 @@
 "use client";
-
 import "../globals.css";
 import { LeftBar } from "@/pages/chat/ui/left-bar";
 
