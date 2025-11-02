@@ -1,4 +1,6 @@
 #!/bin/bash
+
+
 set -e
 
 echo "Starting Ollama server..."
@@ -11,6 +13,7 @@ done
 
 echo "Pulling model..."
 ollama pull gemma3:1b
+ollama run gemma3:1b
 
 echo "Ollama is ready."
 wait
