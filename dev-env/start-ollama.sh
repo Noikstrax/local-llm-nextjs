@@ -12,8 +12,10 @@ while ! curl -s http://localhost:11434 > /dev/null; do
 done
 
 echo "Pulling model..."
+
 ollama pull gemma3:1b
 ollama run gemma3:1b
 
 echo "Ollama is ready."
+
 wait
