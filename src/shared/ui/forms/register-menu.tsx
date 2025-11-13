@@ -5,8 +5,9 @@ import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { registerSchema, TRegisterValues } from "./schema";
 import Link from "next/link";
-import { registerUser } from "../../../../app/api/action";
+
 import { useRouter } from "next/navigation";
+import { registerUser } from "@app/api/action";
 
 export const RegisterMenu = () => {
   const navigate = useRouter();
