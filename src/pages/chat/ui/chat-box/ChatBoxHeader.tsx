@@ -46,7 +46,7 @@ export const ChatBoxHeader = () => {
               <ChevronDown />
             </div>
           </DropdownMenuTrigger>
-          <DropdownMenuContent>
+          <DropdownMenuContent className="bg-black">
             <DropdownMenuLabel>Models</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {models.map((model) => (
