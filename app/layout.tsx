@@ -4,12 +4,10 @@ import "./globals.css";
 import { Providers } from "@/shared/components/providers";
 
 const geistSans = Geist({
-  variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
@@ -25,7 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.className} ${geistMono.className} antialiased`}
       >
         <Providers>
           <div className="w-full max-h-screen">{children}</div>
