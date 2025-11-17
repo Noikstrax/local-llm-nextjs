@@ -2,7 +2,6 @@ import { prisma } from "@/shared/lib/prisma/prisma-client";
 import { ChatBox } from "../../../../src/pages/chat/ui/ChatBox";
 import { ChatBoxHeader } from "../../../../src/pages/chat/ui/chat-box/ChatBoxHeader";
 import { Metadata } from "next";
-import { notFound } from "next/navigation";
 
 interface ChatPageParams {
   id: string;
