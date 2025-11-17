@@ -1,7 +1,7 @@
 import { prisma } from "@/shared/lib/prisma/prisma-client";
-import { ChatBox } from "../../../../src/pages/chat/ui/ChatBox";
 import { ChatBoxHeader } from "../../../../src/pages/chat/ui/chat-box/ChatBoxHeader";
 import { Metadata } from "next";
+import { ChatBoxCreatedChat } from "@/pages/chat/ui/ChatBoxCreatedChat";
 
 interface ChatPageParams {
   id: string;
@@ -41,8 +41,8 @@ export default function Home() {
           <hr className="border-t-[1px] border-gray-300" />
         </div>
       </div>
-      <div className="flex-grow flex items-center px-4 py-8">
-        <ChatBox className="w-full min-h-[200px] flex flex-col justify-center md:pr-[10%] md:pl-[10%] pr-0 pl-0 h-full" />
+      <div className="flex-grow flex items-center">
+        <ChatBoxCreatedChat className="w-full min-h-[200px] flex flex-col justify-center pr-0 pl-0 h-full" />
       </div>
     </div>
   );

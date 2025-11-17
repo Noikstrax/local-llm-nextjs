@@ -8,9 +8,10 @@ import Link from "next/link";
 
 interface Props {
   handleSend: (newMessage: string) => void;
+  className?: string;
 }
 
-export const SendForm = ({ handleSend }: Props) => {
+export const SendForm = ({ handleSend, className }: Props) => {
   const [newMessage, setNewMessage] = useState<string>("");
   const { data: session } = useSession();
   const { loading } = useAppSelector((state) => state.models);
@@ -60,7 +61,7 @@ export const SendForm = ({ handleSend }: Props) => {
         handleSend(newMessage);
         setNewMessage("");
       }}
-      className="flex space-between w-full mt-10"
+      className={className || "flex space-between w-full mt-10"}
     >
       <div className="relative grid grid-cols-1 w-full bg-gray-500 py-2 px-2 rounded-xl">
         <div>
