@@ -1,14 +1,10 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/shared/components/providers";
+import { Inter } from "next/font/google";
+import type { Metadata } from "next";
 
-const geistSans = Geist({
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  subsets: ["latin"],
+const inter = Inter({
+  subsets: ["latin", "cyrillic"],
 });
 
 export const metadata: Metadata = {
@@ -22,9 +18,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.className} ${geistMono.className} antialiased`}
-      >
+      <body className={`${inter.className} antialiased`}>
         <Providers>
           <div className="w-full max-h-screen">{children}</div>
         </Providers>
