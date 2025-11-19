@@ -1,8 +1,7 @@
 import ReactMarkdown from "react-markdown";
 import rehypeHighlight from "rehype-highlight";
-import "highlight.js/styles/github-dark.css"; // подключаем тему
+import "highlight.js/styles/github-dark.css";
 import { Message } from "../MessageList";
-import "./code.css";
 
 interface Props {
   message: Message;
@@ -12,29 +11,54 @@ interface Props {
 export const SuccessfulMessage = ({ message, isAi }: Props) => {
   return (
     <div
-      key={message.id}
-      className={`my-5 rounded-xl max-w-full text-justify prose prose-invert ${
-        isAi ? "self-start" : "self-end bg-zinc-800 px-5 py-3 rounded-xl my-5"
-      }`}
+      className={`w-full flex flex-col ${
+        isAi ? "items-start" : "items-end"
+      } my-2`}
     >
-      <ReactMarkdown
-        rehypePlugins={[rehypeHighlight]}
-        components={{
-          pre: ({ node, ...props }: any) => (
-            <pre
-              className="bg-gray-700 p-3 rounded-lg overflow-hidden mb-2 break-words"
-              {...props}
-            />
-          ),
-          code: ({ node, inline, className, children, ...props }: any) => (
-            <code className="bg-gray-700 px-2 py-0.5 rounded" {...props}>
-              {children}
-            </code>
-          ),
-        }}
+      <div
+        className={` ${
+          isAi
+            ? "max-w-[80%] md:max-w-3xl w-full"
+            : "max-w-[80%] md:max-w-3xl w-auto"
+        } rounded-xl px-4 py-3 
+            ${
+              isAi
+                ? "bg-neutral-900 border border-neutral-800"
+                : "bg-neutral-800"
+            }`}
       >
-        {message.text}
-      </ReactMarkdown>
+        <div
+          className="prose prose-invert max-w-none prose-p:text-neutral-300 prose-code:before:content-['']
+          prose-code:after:content-['']"
+        >
+          <ReactMarkdown
+            rehypePlugins={[rehypeHighlight]}
+            components={{
+              pre: ({ node, ...props }: any) => (
+                <pre
+                  className="font-mono bg-black border border-neutral-700 p-4 rounded-lg overflow-x-auto text-sm"
+                  {...props}
+                />
+              ),
+              code: ({ inline, className, children, ...props }: any) =>
+                inline ? (
+                  <code
+                    className="bg-neutral-700/50 px-1.5 py-0.5 rounded text-sm font-mono"
+                    {...props}
+                  >
+                    {children}
+                  </code>
+                ) : (
+                  <code className={`font-mono ${className}`} {...props}>
+                    {children}
+                  </code>
+                ),
+            }}
+          >
+            {message.text}
+          </ReactMarkdown>
+        </div>
+      </div>
     </div>
   );
 };
