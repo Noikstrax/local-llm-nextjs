@@ -110,14 +110,15 @@ export const ChatBoxCreatedChat = ({ className }: Props) => {
 
   return (
     <div className={className}>
-      <div className="relative max-h-[85vh] overflow-auto px-4 text-white md:pl-[10%] md:pr-[10%]">
+      <div className="relative max-h-[85vh] overflow-auto px-4 text-white md:pl-[13%] md:pr-[13%]">
         <MessageList
           messages={messages}
           className="flex flex-col justify-center gap-2 pb-20"
         />
         <SendForm
           handleSend={handleSend}
-          className="flex space-between w-full sticky bottom-0 px-0 pb-2 bg-gradient-to-t from-[#0a0a0a] to-[#0a0a0a]/0"
+          maxRows={6}
+          className="flex space-between w-full sticky bottom-0 px-0 bg-gradient-to-t from-[#0a0a0a] to-[#0a0a0a]/0"
         />
       </div>
     </div>

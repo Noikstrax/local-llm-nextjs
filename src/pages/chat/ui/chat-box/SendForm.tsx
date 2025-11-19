@@ -1,110 +1,52 @@
 "use client";
-
 import { useEffect, useRef, useState } from "react";
-import { useAppSelector } from "../../../../../app/store/hooks";
 import { cn } from "@/lib/utils";
 import { useSession } from "next-auth/react";
-import Link from "next/link";
+import { useAppSelector } from "@app/store/hooks";
+import { useSendForm } from "@/shared/hooks/useSendForm";
+import { SendButton } from "./SendButton";
 
 interface Props {
   handleSend: (newMessage: string) => void;
   className?: string;
+  maxRows?: number;
 }
 
-export const SendForm = ({ handleSend, className }: Props) => {
-  const [newMessage, setNewMessage] = useState<string>("");
+export const SendForm = ({ handleSend, className, maxRows = 8 }: Props) => {
   const { data: session } = useSession();
   const { loading } = useAppSelector((state) => state.models);
   const isButtonDisabled = loading === "failed" ? true : false;
-  const adjustHeight = (ta: HTMLTextAreaElement) => {
-    ta.style.height = "auto";
 
-    const style = window.getComputedStyle(ta);
-
-    let lineHeight = parseFloat(style.lineHeight);
-
-    if (isNaN(lineHeight)) {
-      const fontSize = parseFloat(style.fontSize);
-      lineHeight = fontSize * 1.2;
-    }
-
-    const maxHeight = lineHeight * 8;
-
-    ta.style.height = Math.min(ta.scrollHeight, maxHeight) + "px";
-    ta.style.overflowY = ta.scrollHeight > maxHeight ? "auto" : "hidden";
-  };
-
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setNewMessage(e.target.value);
-    adjustHeight(e.target);
-  };
-
-  useEffect(() => {
-    if (!textareaRef.current) return;
-
-    const ta = textareaRef.current;
-
-    const observer = new ResizeObserver(() => {
-      adjustHeight(ta);
-    });
-    observer.observe(ta);
-
-    return () => observer.disconnect();
-  }, []);
+  const { newMessage, textareaRef, isMultiline, handleChange, handleSubmit } =
+    useSendForm(handleSend, maxRows);
 
   return (
-    <form
-      onSubmit={(e) => {
-        e.preventDefault();
-        handleSend(newMessage);
-        setNewMessage("");
-      }}
-      className={className || "flex space-between w-full mt-10"}
-    >
-      <div className="relative grid grid-cols-1 w-full bg-gray-500 py-2 px-2 rounded-xl">
-        <div>
-          <textarea
-            id="input"
-            className="border px-2 py-1 rounded w-full border-none outline-none resize-none"
-            value={newMessage}
-            onChange={(e) => {
-              handleChange(e);
-            }}
-            ref={textareaRef}
-          />
-        </div>
+    <form onSubmit={handleSubmit} className={className || "flex w-full mt-10"}>
+      {" "}
+      <div
+        className={cn(
+          "relative w-full bg-gray-500 py-2 px-2 rounded-xl transition-all mb-0",
+          isMultiline ? "flex-col" : "flex"
+        )}
+      >
+        {" "}
+        <textarea
+          id="input"
+          rows={1}
+          placeholder="Enter your message..."
+          className="w-full border-none outline-none resize-none bg-transparent px-2 py-1 rounded"
+          value={newMessage}
+          onChange={handleChange}
+          ref={textareaRef}
+        />{" "}
         <div className="flex justify-end">
-          {!session ? (
-            <Link href="/login">
-              <button
-                className={cn(
-                  isButtonDisabled
-                    ? "bg-gray-800 text-white px-4 py-1 rounded cursor-pointer row-end-1 opacity-60 hover:bg-red-500"
-                    : "bg-blue-500 text-white px-4 py-1 rounded cursor-pointer row-end-1 hover:bg-green-500"
-                )}
-                type="button"
-                disabled={isButtonDisabled}
-              >
-                Send
-              </button>
-            </Link>
-          ) : (
-            <button
-              className={cn(
-                isButtonDisabled
-                  ? "bg-gray-800 text-white px-4 py-1 rounded cursor-pointer row-end-1 opacity-60 hover:bg-red-500"
-                  : "bg-blue-500 text-white px-4 py-1 rounded cursor-pointer row-end-1 hover:bg-green-500"
-              )}
-              type="submit"
-              disabled={isButtonDisabled}
-            >
-              Send
-            </button>
-          )}
-        </div>
-      </div>
+          {" "}
+          <SendButton
+            isLoggedIn={!!session}
+            isButtonDisabled={isButtonDisabled}
+          />{" "}
+        </div>{" "}
+      </div>{" "}
     </form>
   );
 };
