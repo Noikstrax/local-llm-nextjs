@@ -14,6 +14,22 @@
   transition: transform 0.3s ease;
 }
 
+.logoUserMenu {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid white;
+  color: rgb(122, 111, 130);
+  font-size: 10px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  transition: transform 0.3s ease;
+}
+
 .logo:hover {
   transform: scale(1.1) rotate(3deg);
 }
