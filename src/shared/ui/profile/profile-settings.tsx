@@ -16,9 +16,8 @@ import { TemperatureSlider } from "./temperature-slider";
 import { temperatureSchema, TTemperatureValue } from "../forms/schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
-import { Settings } from "lucide-react";
 
-export function ProfileSettings() {
+export function ProfileSettings({ children }: React.PropsWithChildren) {
   const [open, setOpen] = useState(false);
 
   const form = useForm<TTemperatureValue>({
@@ -29,8 +28,6 @@ export function ProfileSettings() {
   });
 
   const onSubmit = async (data: TTemperatureValue) => {
-    console.log(data.temperature);
-
     try {
       const res = await fetch(`/api/profile/settings/temperature/`, {
         method: "POST",
@@ -49,45 +46,43 @@ export function ProfileSettings() {
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="outline">
-          <Settings />
-        </Button>
-      </DialogTrigger>
-      <FormProvider {...form}>
-        <DialogContent className="sm:max-w-[425px]">
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogHeader>
-              <DialogTitle>Profile settings</DialogTitle>
-              <DialogDescription>Profile Settings</DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4">
-              <div className="grid gap-3">
-                <Label htmlFor="temperature">Temperature</Label>
-                <Controller
-                  control={form.control}
-                  name="temperature"
-                  render={({ field }) => (
-                    <TemperatureSlider
-                      value={field.value}
-                      onChange={field.onChange}
-                    />
-                  )}
-                />
+    <div className="w-full">
+      <Dialog open={open} onOpenChange={setOpen}>
+        <DialogTrigger asChild>{children}</DialogTrigger>
+        <FormProvider {...form}>
+          <DialogContent className="sm:max-w-[425px]">
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <DialogHeader>
+                <DialogTitle>Profile settings</DialogTitle>
+                <DialogDescription>Profile Settings</DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4">
+                <div className="grid gap-3">
+                  <Label htmlFor="temperature">Temperature</Label>
+                  <Controller
+                    control={form.control}
+                    name="temperature"
+                    render={({ field }) => (
+                      <TemperatureSlider
+                        value={field.value}
+                        onChange={field.onChange}
+                      />
+                    )}
+                  />
+                </div>
               </div>
-            </div>
-            <DialogFooter>
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button variant={"secondary"} type="submit">
-                Save changes
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogContent>
-      </FormProvider>
-    </Dialog>
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button variant={"secondary"} type="submit">
+                  Save changes
+                </Button>
+              </DialogFooter>
+            </form>
+          </DialogContent>
+        </FormProvider>
+      </Dialog>
+    </div>
   );
 }
