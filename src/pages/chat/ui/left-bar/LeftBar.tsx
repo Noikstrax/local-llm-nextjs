@@ -2,61 +2,130 @@
 
 import Link from "next/link";
 import { ChatsList } from "./ChatsList";
-import { LoginMenu } from "@/shared/ui";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/shared/ui";
 import { UserAuth } from "@/shared/components/user-auth";
 import { Logo } from "@/shared/ui/icons/logo";
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarProvider,
+} from "@/shared/ui/sidebar";
+import { ProfileSettings } from "@/shared/ui/profile/profile-settings";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/shared/ui/collapsible";
+import { ChevronDown, LogOut, Settings } from "lucide-react";
+import { signOut, useSession } from "next-auth/react";
 
 interface Props {
   className?: string;
 }
 
 export const LeftBar = ({ className }: Props) => {
-  return (
-    <div className={className + "flex flex-col h-screen"}>
-      <div className="sticky top-0 block w-full">
-        <div className="flex justify-between py-3 pl-2 px-2">
-          <div>
-            <Link href="\">
-              <Logo text="LLmw" />
-            </Link>
-          </div>
-          <div>
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-              }}
-              className="hover:cursor-pointer"
-            >
-              Hide
-            </button>
-          </div>
-        </div>
-        <Link
-          href="/"
-          className="hover:bg-gray-500 rounded-md py-1 pl-2 block w-full"
-        >
-          New chat
-        </Link>
-        <Link
-          href="/"
-          className="hover:bg-gray-500 rounded-md py-1 pl-2 block w-full"
-        >
-          Search in chats
-        </Link>
-      </div>
-      <div className="w-full">
-        <hr className="border-t-2 border-gray-300 my-2" />
-      </div>
+  const { data: session, status } = useSession();
 
-      <div className="flex-1 overflow-y-auto mt-2 pl-2 px-2">
-        <ChatsList />
-      </div>
-      <div className="w-full">
-        <hr className="border-t-2 border-gray-300 my-2" />
-      </div>
-      <div className="py-2 pl-2 px-1">
-        <UserAuth />
-      </div>
-    </div>
+  return (
+    <SidebarProvider>
+      <Sidebar className={className}>
+        <SidebarHeader>
+          <div className="flex justify-between py-3 pl-2 px-2">
+            <div>
+              <Link href="\">
+                <Logo text="LLmw" />
+              </Link>
+            </div>
+            <div>
+              <button
+                onClick={(e) => {
+                  e.preventDefault();
+                }}
+                className="hover:cursor-pointer"
+              ></button>
+            </div>
+          </div>
+          <SidebarGroup>
+            <Link
+              href="/"
+              className="hover:bg-gray-500 rounded-md mt-2 block w-full"
+            >
+              New chat
+            </Link>
+            <Link
+              href="/"
+              className="hover:bg-gray-500 rounded-md mt-2 block w-full"
+            >
+              Search in chats
+            </Link>
+          </SidebarGroup>
+        </SidebarHeader>
+        <SidebarContent>
+          <Collapsible defaultOpen={true}>
+            <SidebarGroup>
+              <SidebarGroupLabel asChild className="text-gray-400">
+                <CollapsibleTrigger className="group">
+                  Chats
+                  <ChevronDown className="ml-auto transition-transform" />
+                </CollapsibleTrigger>
+              </SidebarGroupLabel>
+              <CollapsibleContent>
+                <ChatsList />
+              </CollapsibleContent>
+            </SidebarGroup>
+          </Collapsible>
+          <SidebarGroup />
+        </SidebarContent>
+        <SidebarFooter>
+          {status === "loading" ? null : session ? (
+            <SidebarMenu>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <SidebarMenuButton className="border-none outline-none hover:opacity-80 hover:cursor-pointer hover:bg-gray-800 rounded-xl h-10">
+                    <UserAuth session={session} />
+                  </SidebarMenuButton>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="top"
+                  className="w-[--radix-popper-anchor-width] outline-none"
+                >
+                  <DropdownMenuItem asChild>
+                    <ProfileSettings>
+                      <div className="flex outline-none items-center hover:cursor-pointer hover:bg-gray-800 rounded-xl p-2 ">
+                        <Settings width={24} />
+                        <span className="ml-2">Settings</span>
+                      </div>
+                    </ProfileSettings>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild onClick={() => signOut()}>
+                    <div className="w-full flex outline-none items-center hover:cursor-pointer hover:bg-gray-800 rounded-xl ml-1 p-2">
+                      <LogOut />
+                      <span className="ml-1 text-[16px]">SignOut</span>
+                    </div>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </SidebarMenu>
+          ) : (
+            <Link href="/login">
+              <SidebarMenuButton className="hover:opacity-80 hover:cursor-pointer hover:bg-gray-800 rounded-xl h-10">
+                Login
+              </SidebarMenuButton>
+            </Link>
+          )}
+        </SidebarFooter>
+      </Sidebar>
+    </SidebarProvider>
   );
 };
