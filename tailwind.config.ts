@@ -33,7 +33,6 @@ const config: Config = {
           "monospace",
         ],
       },
-      // Давайте добавим тестовый цвет, чтобы проверить, работает ли файл
     },
   },
   plugins: [require("@tailwindcss/typography")],
