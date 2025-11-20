@@ -1,33 +1,27 @@
-import { useSession, signOut } from "next-auth/react";
 import Link from "next/link";
-import { Button } from "../ui";
-import { ProfileSettings } from "../ui/profile/profile-settings";
-import { LogOut } from "lucide-react";
 import { Logo } from "../ui/icons/logo";
+import { Session } from "next-auth";
 
-export const UserAuth = () => {
-  const { data: session } = useSession();
-  const firstLetterFromName = session?.user.name.split("")[0].toUpperCase();
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
+
+interface Props {
+  session: Session;
+}
+
+export const UserAuth = ({ session }: Props) => {
+  const userName = capitalize(session?.user.name || "");
   return (
-    <div className="flex justify-between max-w-full items-center">
-      {!session ? (
-        <>
-          <Link href={"/login"}>Login</Link>
-        </>
-      ) : (
-        <>
-          <div>
-            <Logo text={firstLetterFromName ?? ""} className="text-xl" />
-          </div>
-
-          <div className="flex items-center gap-4 ml-auto">
-            <ProfileSettings />
-            <Button variant="outline" onClick={() => signOut()}>
-              <LogOut />
-            </Button>
-          </div>
-        </>
-      )}
+    <div className="flex justify-between max-w-full items-center p-1">
+      <div key={"Profile-Settings"} className="p-2">
+        <div className="flex items-center">
+          <Logo
+            text={userName.charAt(0)}
+            className="text-xl"
+            isUserLogo={true}
+          />
+          <div className="ml-4 text-l">{userName}</div>
+        </div>
+      </div>
     </div>
   );
 };
