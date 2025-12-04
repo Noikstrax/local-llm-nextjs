@@ -29,7 +29,7 @@ export const SuccessfulMessage = ({ message, isAi }: Props) => {
       >
         <div
           className="prose prose-invert max-w-none prose-p:text-neutral-300 prose-code:before:content-['']
-          prose-code:after:content-['']"
+          prose-code:after:content-[''] text-xl"
         >
           <ReactMarkdown
             rehypePlugins={[rehypeHighlight]}
