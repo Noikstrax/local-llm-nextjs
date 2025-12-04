@@ -33,7 +33,7 @@ export const SendForm = ({ handleSend, className, maxRows = 8 }: Props) => {
           id="input"
           rows={1}
           placeholder="Enter your message..."
-          className="w-full border-none outline-none resize-none bg-transparent px-2 py-1 rounded"
+          className="w-full border-none outline-none resize-none bg-transparent px-2 py-1 rounded text-xl"
           value={newMessage}
           onChange={handleChange}
           ref={textareaRef}
